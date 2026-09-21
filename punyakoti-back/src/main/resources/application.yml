@@ -1,0 +1,131 @@
+spring:
+  application:
+    name: agri-livestock-ecommerce-backend
+
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/punyakoti?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:test}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+      minimum-idle: 2
+      pool-name: AgriHikariPool
+
+  jpa:
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:update}
+    show-sql: ${JPA_SHOW_SQL:false}
+    open-in-view: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        enable_lazy_load_no_trans: true
+        jdbc:
+          time_zone: UTC
+
+  servlet:
+    multipart:
+      max-file-size: ${MAX_FILE_SIZE:25MB}
+      max-request-size: ${MAX_REQUEST_SIZE:50MB}
+
+  mail:
+    host: ${MAIL_HOST:MAIL_HOST}
+    port: ${MAIL_PORT:MAIL_PORT}
+    username: ${MAIL_USERNAME:MAIL_USER}
+    password: ${MAIL_PASSWORD:MAIL_PASS}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /
+  error:
+    include-message: always
+    include-binding-errors: always
+
+# ------------------------------------------------------------------
+# Application specific configuration
+# ------------------------------------------------------------------
+app:
+  jwt:
+    secret: ${JWT_SECRET:Y2hhbmdlLXRoaXMtc2VjcmV0LXRvLWEtdmVyeS1sb25nLXJhbmRvbS1zdHJpbmctdmFsdWU=}
+    # Access token validity in milliseconds (default 15m)
+    expiration-ms: ${JWT_EXPIRATION_MS:900000}
+    # Refresh token validity in milliseconds (default 7 days)
+    refresh-expiration-ms: ${JWT_REFRESH_EXPIRATION_MS:604800000}
+    issuer: agri-livestock-ecommerce
+
+  otp:
+    # Length of the generated OTP
+    length: ${OTP_LENGTH:6}
+    # OTP validity in seconds (default 5 minutes)
+    expiry-seconds: ${OTP_EXPIRY_SECONDS:300}
+    # Max verification attempts per OTP
+    max-attempts: ${OTP_MAX_ATTEMPTS:5}
+    # Active provider: log | firebase
+    provider: ${OTP_PROVIDER:log}
+
+  media:
+    # Active provider: local | cloudinary
+    provider: ${MEDIA_PROVIDER:local}
+    local:
+      base-path: ${MEDIA_LOCAL_PATH:uploads}
+      public-url: ${MEDIA_PUBLIC_URL:http://localhost:8080/media}
+
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
+
+  razorpay:
+    key-id: ${RAZORPAY_KEY_ID:KEY_ID}
+    key-secret: ${RAZORPAY_KEY_SECRET:KEY_SECRET}
+
+  google:
+    client-id: ${GOOGLE_CLIENT_ID:GOOGLE_ID}
+
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME:}
+  api-key: ${CLOUDINARY_API_KEY:}
+  api-secret: ${CLOUDINARY_API_SECRET:}
+
+firebase:
+  # Path or content of the service account; provider only used when app.otp.provider=firebase
+  service-account: ${FIREBASE_SERVICE_ACCOUNT:}
+
+# ------------------------------------------------------------------
+# Swagger / OpenAPI
+# ------------------------------------------------------------------
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+  api-docs:
+    path: /v3/api-docs
+
+# ------------------------------------------------------------------
+# Actuator health checks
+# ------------------------------------------------------------------
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.agrilivestock: ${LOG_LEVEL:INFO}
+    org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

@@ -1,0 +1,97 @@
+services:
+  # ---------------- MySQL Database ----------------
+  mysql:
+    image: mysql:8.4
+    container_name: agri-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_DATABASE: ${DB_NAME:-agri_ecommerce}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - agri-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_PASSWORD:-root}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ---------------- phpMyAdmin ----------------
+  phpmyadmin:
+    image: phpmyadmin:5
+    container_name: agri-phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 50M
+    ports:
+      - "8085:80"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - agri-network
+
+  # ---------------- Spring Boot Backend ----------------
+  agri-backend:
+    build:
+      context: ./punyakoti-back
+      dockerfile: Dockerfile
+    container_name: agri-backend
+    restart: unless-stopped
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/${DB_NAME:-agri_ecommerce}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USERNAME: root
+      DB_PASSWORD: ${DB_PASSWORD:-root}
+      JWT_SECRET: ${JWT_SECRET:-Y2hhbmdlLXRoaXMtc2VjcmV0LXRvLWEtdmVyeS1sb25nLXJhbmRvbS1zdHJpbmctdmFsdWU=}
+      OTP_PROVIDER: ${OTP_PROVIDER:-log}
+      MEDIA_PROVIDER: ${MEDIA_PROVIDER:-local}
+      CLOUDINARY_CLOUD_NAME: ${CLOUDINARY_CLOUD_NAME:-}
+      CLOUDINARY_API_KEY: ${CLOUDINARY_API_KEY:-}
+      CLOUDINARY_API_SECRET: ${CLOUDINARY_API_SECRET:-}
+      # Allow frontend origin if running on port 80/443 (handled by proxy, but safe to allow)
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost,http://localhost:80}
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - agri-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - ./punyakoti-back/uploads:/app/uploads
+
+  # ---------------- React/Vite Frontend ----------------
+  agri-frontend:
+    build:
+      context: ./punyakoti-front
+      dockerfile: Dockerfile
+      args:
+        # Bake in the API URL used by frontend. 
+        # Nginx will proxy /api/v1 to http://agri-backend:8080/api/v1
+        VITE_API_URL: /api/v1
+    container_name: agri-frontend
+    restart: unless-stopped
+    ports:
+      - "3002:80"
+    depends_on:
+      agri-backend:
+        condition: service_healthy
+    networks:
+      - agri-network
+
+volumes:
+  mysql-data:
+
+networks:
+  agri-network:
+    driver: bridge

@@ -1,0 +1,34 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Uploads
+uploads/
+**/uploads/
+punyakoti-back/uploads/
+
+# Node
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Java/Spring Boot
+target/
+*.jar
+*.war
+*.ear
+.mvn/
+
+# IDEs and OS
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Misc Data
+mysql-data/
+*.log

@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #3874FF;
+  --color-primary-light: #F4CEFF;
+  --color-primary-dark: #03045e;
+  --color-secondary: #fbbd13;
+  --color-accent: #1f9d55;
+  --color-warm-bg: #f8fafc;
+  --color-warm-card: #ffffff;
+  
+  --font-sans: 'Nunito', sans-serif;
+  --font-display: 'Nunito', sans-serif;
+  
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@layer base {
+  body {
+    @apply bg-warm-bg text-stone-800 font-sans antialiased selection:bg-primary/20 selection:text-primary-dark;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display text-primary-dark font-semibold tracking-tight;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-stone-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-stone-300 rounded-full hover:bg-stone-400 transition-colors;
+}
+
+/* Hide default Swiper navigation arrows (we use custom buttons) */
+.swiper-button-next,
+.swiper-button-prev {
+  display: none !important;
+}
+
+/* Override for reviews custom nav buttons - remove Swiper's disabled state */
+.reviews-prev-btn.swiper-button-disabled,
+.reviews-next-btn.swiper-button-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* OTP Input active state */
+.otp-input-container input:focus {
+  @apply border-primary ring-2 ring-primary/20 outline-hidden;
+}
+
+/* Custom glassmorphism cards */
+.glass-panel {
+  @apply bg-white/70 backdrop-blur-md border border-white/40 shadow-xs;
+}
+
+/* Custom Swiper Pagination bullets exactly like image mockup */
+.custom-pagination {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-pagination .swiper-pagination-bullet {
+  background: #cbd5e1 !important;
+  opacity: 1 !important;
+  width: 8px !important;
+  height: 8px !important;
+  margin: 0 4px !important;
+  border-radius: 9999px !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer;
+}
+
+.custom-pagination .swiper-pagination-bullet-active {
+  background: #1f9d55 !important;
+  width: 20px !important;
+}
