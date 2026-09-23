@@ -29,8 +29,6 @@ const Checkout = () => {
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [newAddress, setNewAddress] = useState({
-    fullName: "",
-    phoneNumber: "",
     line1: "",
     line2: "",
     city: "",
@@ -62,23 +60,32 @@ const Checkout = () => {
     onError: () => toast.error("Failed to add address"),
   });
 
+  const [paymentMethod, setPaymentMethod] = useState("ONLINE");
+
   const handlePlaceOrder = async () => {
     if (!selectedAddressId) {
       toast.error("Please select a delivery address");
       return;
     }
 
-    const res = await loadScript(
-      "https://checkout.razorpay.com/v1/checkout.js",
-    );
-
-    if (!res) {
-      toast.error("Razorpay SDK failed to load. Are you online?");
-      return;
-    }
-
     try {
-      const paymentOrder = await paymentApi.createOrder(selectedAddressId);
+      const paymentOrder = await paymentApi.createOrder(selectedAddressId, paymentMethod);
+
+      if (paymentMethod === "COD") {
+        clearCart();
+        toast.success("Order placed successfully with Cash on Delivery!");
+        navigate(`/order-success?orderId=${paymentOrder.id}`);
+        return;
+      }
+
+      const res = await loadScript(
+        "https://checkout.razorpay.com/v1/checkout.js",
+      );
+
+      if (!res) {
+        toast.error("Razorpay SDK failed to load. Are you online?");
+        return;
+      }
 
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_TecnignPhWzH4D",
@@ -115,7 +122,7 @@ const Checkout = () => {
       const paymentObject = new window.Razorpay(options);
       paymentObject.open();
     } catch (error) {
-      toast.error("Failed to initiate payment.");
+      toast.error("Failed to initiate payment or place order.");
     }
   };
 
@@ -167,13 +174,7 @@ const Checkout = () => {
                             <FiCheck className="w-3 h-3" />
                           </div>
                         )}
-                        <h4 className="font-bold text-stone-800 text-sm mb-1">
-                          {addr.fullName}
-                        </h4>
-                        <p className="text-xs text-stone-500 mb-2">
-                          {addr.phoneNumber}
-                        </p>
-                        <p className="text-[11px] text-stone-600 leading-relaxed">
+                        <p className="text-[11px] text-stone-600 leading-relaxed mt-2">
                           {addr.line1}, {addr.line2 && `${addr.line2},`} <br />
                           {addr.city}, {addr.state} - {addr.postalCode}
                         </p>
@@ -198,32 +199,6 @@ const Checkout = () => {
                       New Address Details
                     </h4>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <input
-                        type="text"
-                        placeholder="Full Name"
-                        required
-                        value={newAddress.fullName}
-                        onChange={(e) =>
-                          setNewAddress({
-                            ...newAddress,
-                            fullName: e.target.value,
-                          })
-                        }
-                        className="w-full bg-white border border-stone-250 rounded-xl px-3 py-2 text-sm focus:outline-hidden focus:border-primary"
-                      />
-                      <input
-                        type="tel"
-                        placeholder="Phone Number"
-                        required
-                        value={newAddress.phoneNumber}
-                        onChange={(e) =>
-                          setNewAddress({
-                            ...newAddress,
-                            phoneNumber: e.target.value,
-                          })
-                        }
-                        className="w-full bg-white border border-stone-250 rounded-xl px-3 py-2 text-sm focus:outline-hidden focus:border-primary"
-                      />
                       <input
                         type="text"
                         placeholder="Address Line 1"
@@ -306,6 +281,44 @@ const Checkout = () => {
                 )}
               </div>
             )}
+          </div>
+          
+          {/* Payment Method Selection */}
+          <div className="bg-white border border-stone-200/80 rounded-3xl p-6 shadow-sm space-y-4">
+            <h3 className="font-display font-bold text-stone-850 text-xl border-b border-stone-100 pb-3">
+              Payment Method
+            </h3>
+            <div className="space-y-3">
+              <label className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all ${paymentMethod === 'ONLINE' ? 'border-primary bg-primary/5' : 'border-stone-200 hover:border-primary/30'}`}>
+                <input 
+                  type="radio" 
+                  name="paymentMethod" 
+                  value="ONLINE" 
+                  checked={paymentMethod === 'ONLINE'} 
+                  onChange={() => setPaymentMethod('ONLINE')}
+                  className="w-4 h-4 text-primary focus:ring-primary border-stone-300"
+                />
+                <div>
+                  <span className="block font-semibold text-stone-800 text-sm">Pay Online</span>
+                  <span className="block text-xs text-stone-500 mt-0.5">UPI, Cards, NetBanking (via Razorpay)</span>
+                </div>
+              </label>
+              
+              <label className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all ${paymentMethod === 'COD' ? 'border-primary bg-primary/5' : 'border-stone-200 hover:border-primary/30'}`}>
+                <input 
+                  type="radio" 
+                  name="paymentMethod" 
+                  value="COD" 
+                  checked={paymentMethod === 'COD'} 
+                  onChange={() => setPaymentMethod('COD')}
+                  className="w-4 h-4 text-primary focus:ring-primary border-stone-300"
+                />
+                <div>
+                  <span className="block font-semibold text-stone-800 text-sm">Cash on Delivery</span>
+                  <span className="block text-xs text-stone-500 mt-0.5">Pay at your doorstep</span>
+                </div>
+              </label>
+            </div>
           </div>
         </div>
 

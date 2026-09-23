@@ -38,7 +38,6 @@ const AdminLayout = () => {
     { name: "Carts", path: "/admin/carts", icon: FiShoppingCart },
     { name: "Users", path: "/admin/users", icon: FiUsers },
     { name: "Reviews", path: "/admin/reviews", icon: FiMessageSquare },
-    { name: "Banners", path: "/admin/banners", icon: FiImage },
     { name: "FAQ", path: "/admin/faq", icon: FiHelpCircle },
     {
       name: "Why Choose Us",
@@ -46,6 +45,7 @@ const AdminLayout = () => {
       icon: FiCheckCircle,
     },
     { name: "How It Works", path: "/admin/how-it-works", icon: FiTv },
+    { name: "Contacts", path: "/admin/contacts", icon: FiMessageSquare },
   ];
 
   return (

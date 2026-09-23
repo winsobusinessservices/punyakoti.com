@@ -2,14 +2,15 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { FiStar, FiArrowRight } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
+import { FaShoppingCart } from "react-icons/fa";
 
 const ProductCard = ({ product }) => {
   const { t } = useTranslation();
+  // console.log(product);
 
   return (
     <div className="bg-white rounded-3xl overflow-hidden border border-stone-200/80 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full group hover:-translate-y-1">
-      {/* Product Image */}
-      <div className="relative aspect-square overflow-hidden bg-stone-50 shrink-0 p-8 border-b border-stone-200">
+      <div className="relative aspect-square overflow-hidden shrink-0 p-3 m-4 rounded-2xl">
         <img
           src={
             (product.media || []).find((m) => m.type === "IMAGE")?.url ||
@@ -30,11 +31,9 @@ const ProductCard = ({ product }) => {
         </span>
       </div>
 
-      {/* Product Content */}
-      <div className="p-6 flex-grow flex flex-col justify-between">
+      <div className="px-6 flex-grow flex flex-col justify-between pb-3">
         <div>
-          {/* Rating */}
-          <div className="flex items-center gap-1.5 mb-2.5">
+          {/* <div className="flex items-center gap-1.5 mb-2.5">
             <div className="flex items-center text-amber-400">
               <FiStar className="w-3.5 h-3.5 fill-current" />
             </div>
@@ -45,26 +44,30 @@ const ProductCard = ({ product }) => {
             <span className="text-xs text-stone-400">
               {product.reviewCount || 0} {t("reviews")}
             </span>
-          </div>
+          </div> */}
 
-          {/* Title */}
-          <h3 className="font-display font-semibold text-stone-850 text-base md:text-lg mb-2 leading-tight group-hover:text-primary transition-colors">
+          <h3 className="font-display font-semibold text-stone-850 text-base md:text-lg mb-2 leading-tight group-hover:text-secondary transition-colors">
             <Link to={`/products/${product.id}`}>{product.name}</Link>
           </h3>
 
-          {/* Short Description */}
+          <div className="flex items-center justify-between gap-2 pb-1">
+            {product?.variants?.map((variant, index) => {
+              return (
+                <div key={index} className="border border-primary-light rounded-full px-1">
+                  <p className="text-[12px] font-semibold">{variant?.weight}</p>
+                </div>
+              );
+            })}
+          </div>
+
           <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed mb-4">
-            {product.shortDescription}
+            {product.shortDescription || product.description}
           </p>
         </div>
 
-        {/* Footer actions */}
-        <div className="flex items-center justify-between pt-4 border-t border-stone-100">
+        <div className="flex items-center gap-6">
           <div>
-            <span className="text-[10px] uppercase font-bold text-stone-400 block tracking-wider leading-none mb-1">
-              Price starts at
-            </span>
-            <span className="text-lg font-bold text-primary-dark">
+            <span className="text-xl font-bold text-primary-dark">
               ₹
               {product.variants && product.variants.length > 0
                 ? [...product.variants].sort((a, b) => a.price - b.price)[0]
@@ -74,10 +77,10 @@ const ProductCard = ({ product }) => {
           </div>
           <Link
             to={`/products/${product.id}`}
-            className="flex items-center gap-2 bg-primary hover:bg-primary-light text-white font-semibold text-xs px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95 focus:outline-hidden"
+            className="flex items-center w-full justify-center gap-2 bg-primary hover:bg-primary-light text-white font-semibold px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95 focus:outline-hidden"
           >
+            <FaShoppingCart className="w-4 h-4" />
             <span>{t("shopNow")}</span>
-            <FiArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       </div>

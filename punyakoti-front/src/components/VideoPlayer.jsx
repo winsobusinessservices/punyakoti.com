@@ -1,37 +1,45 @@
 import React from "react";
+
 import ReactPlayer from "react-player";
 
-const VideoPlayer = ({ url, poster, className = "" }) => {
+const VideoPlayer = ({ 
+  url, 
+  poster, 
+  className = "",
+  controls = false,
+  autoPlay = true,
+  loop = true,
+  muted = true
+}) => {
+  // Extract YouTube ID if it's a YouTube URL to use as poster if none provided
+  let light = poster;
+  if (!poster && url && (url.includes('youtube.com') || url.includes('youtu.be'))) {
+    light = true; // react-player will automatically fetch the thumbnail
+  }
+
   return (
     <div
-      className={`relative overflow-hidden rounded-3xl shadow-md border border-stone-200 bg-black aspect-video w-full ${className}`}
+      className={`relative overflow-hidden rounded-3xl shadow-md border border-stone-200 bg-black aspect-video w-full flex items-center justify-center ${className}`}
     >
-      {/* <ReactPlayer
+      <ReactPlayer
         url={url}
-        controls
-        playing={true}
+        playing={autoPlay}
+        loop={loop}
+        muted={muted}
+        controls={controls}
         width="100%"
         height="100%"
-        light={poster || false} // Show thumbnail first for faster initial load
-        playIcon={
-          <div
-            className="w-16 h-16 rounded-full bg-secondary text-primary-dark shadow-2xl flex items-center justify-center hover:scale-115 active:scale-95 transition-all cursor-pointer"
-            aria-label="Play video"
-          >
-            <span className="ml-1.5 border-y-[10px] border-y-transparent border-l-[16px] border-l-primary-dark"></span>
-          </div>
-        }
-      /> */}
-      <video
-        src={url}
-        // controls
-        autoPlay
-        loop
-        muted
-        className="h-full w-full"
-      ></video>
+        light={light}
+        className="absolute top-0 left-0"
+        config={{
+          youtube: {
+            playerVars: { showinfo: 1 }
+          }
+        }}
+      />
     </div>
   );
 };
 
 export default VideoPlayer;
+

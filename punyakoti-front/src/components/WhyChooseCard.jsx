@@ -1,50 +1,23 @@
 import React from "react";
-import * as GiIcons from "react-icons/gi";
 
-const WhyChooseCard = ({ icon, title, description, index = 0 }) => {
-  const IconComponent = GiIcons[icon] || GiIcons.GiCow;
-
-  // Distinct color palettes matching Gau Sampurna theme & agricultural vibe
-  const styles = [
-    {
-      iconBg: "bg-white/95 text-emerald-700",
-      textMuted: "text-emerald-100",
-    },
-    {
-      iconBg: "bg-white/95 text-primary",
-      textMuted: "text-blue-100",
-    },
-    {
-      iconBg: "bg-white/95 text-amber-700",
-      textMuted: "text-amber-100",
-    },
-    {
-      iconBg: "bg-white/95 text-sky-650",
-      textMuted: "text-sky-100",
-    },
-  ];
-
-  const currentStyle = styles[index % styles.length];
+const WhyChooseCard = ({ title, description, index = 0 }) => {
+  const formattedNumber = String(index + 1).padStart(2, "0");
 
   return (
-    <div
-      className={`rounded-3xl p-6 transition-all duration-300 flex flex-col items-center text-center group hover:-translate-y-1.5 hover:shadow-2xl border-0`}
-    >
-      <div
-        className={`w-14 h-14 rounded-2xl flex shrink-0 items-center justify-center md:mb-5 mb-1 transition-all duration-300 group-hover:rotate-6 shadow-md ${currentStyle.iconBg}`}
-      >
-        <IconComponent className="w-8 h-8" />
+    <div className="group flex flex-col text-center items-center">
+      {/* Number with cut-off effect */}
+      <div className="h-[36px] md:h-[42px] overflow-hidden mb-6 flex justify-center w-full relative">
+        <span className="text-[64px] md:text-[80px] font-display font-black text-gray-300 group-hover:text-primary transition-colors duration-300 block leading-[1]">
+          {formattedNumber}
+        </span>
       </div>
-      <span className="">
-        <h3 className="font-display font-extrabold text-base md:text-lg mb-2 text-white leading-tight">
-          {title}
-        </h3>
-        <p
-          className={`text-xs md:text-sm leading-relaxed font-medium text-white/80`}
-        >
-          {description}
-        </p>
-      </span>
+
+      <h3 className="font-display font-bold text-sm md:text-base mb-3 text-gray-900 leading-tight transition-colors group-hover:text-primary">
+        {title}
+      </h3>
+      <p className="text-[11px] md:text-xs leading-relaxed text-gray-500 max-w-[200px]">
+        {description}
+      </p>
     </div>
   );
 };

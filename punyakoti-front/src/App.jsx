@@ -22,6 +22,9 @@ import OrderSuccess from "./pages/OrderSuccess";
 import Checkout from "./pages/Checkout";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import AboutUs from "./pages/AboutUs";
+import Blogs from "./pages/Blogs";
+import ContactUs from "./pages/ContactUs";
 
 // Pages - Admin Panel
 import Admin from "./pages/Admin";
@@ -33,8 +36,8 @@ import AdminFAQ from "./pages/AdminFAQ";
 import AdminWhyChooseUs from "./pages/AdminWhyChooseUs";
 import AdminHowItWorks from "./pages/AdminHowItWorks";
 import AdminCategories from "./pages/AdminCategories";
-import AdminBanners from "./pages/AdminBanners";
 import AdminAbandonedCarts from "./pages/AdminAbandonedCarts";
+import AdminContacts from "./pages/AdminContacts";
 
 function App() {
   return (
@@ -64,6 +67,9 @@ function App() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-success" element={<OrderSuccess />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/blogs" element={<Blogs />} />
+          <Route path="/contact" element={<ContactUs />} />
           <Route path="*" element={<NotFound />} />
         </Route>
 
@@ -76,10 +82,10 @@ function App() {
           <Route path="orders" element={<AdminOrders />} />
           <Route path="carts" element={<AdminAbandonedCarts />} />
           <Route path="reviews" element={<AdminReviews />} />
-          <Route path="banners" element={<AdminBanners />} />
           <Route path="faq" element={<AdminFAQ />} />
           <Route path="why-choose-us" element={<AdminWhyChooseUs />} />
           <Route path="how-it-works" element={<AdminHowItWorks />} />
+          <Route path="contacts" element={<AdminContacts />} />
         </Route>
       </Routes>
     </BrowserRouter>

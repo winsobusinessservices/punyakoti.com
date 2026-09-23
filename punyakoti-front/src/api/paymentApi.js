@@ -1,8 +1,8 @@
 import axiosInstance from './axios';
 
 export const paymentApi = {
-  createOrder: async (addressId) => {
-    const response = await axiosInstance.post('/orders', { addressId });
+  createOrder: async (addressId, paymentMethod = 'ONLINE') => {
+    const response = await axiosInstance.post('/orders', { addressId, paymentMethod });
     return response.data?.data || response.data;
   },
   verifyPayment: async (localOrderId, razorpayOrderId, razorpayPaymentId, razorpaySignature) => {

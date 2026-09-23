@@ -10,7 +10,6 @@ const AdminHowItWorks = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
-  const [videoFile, setVideoFile] = useState(null);
   const [currentItemId, setCurrentItemId] = useState(null);
 
   const { data: steps = [], isLoading } = useQuery({
@@ -31,9 +30,9 @@ const AdminHowItWorks = () => {
   const saveMutation = useMutation({
     mutationFn: (data) => {
       if (currentItemId) {
-        return howItWorksApi.update(currentItemId, data.payload, data.videoFile);
+        return howItWorksApi.update(currentItemId, data);
       } else {
-        return howItWorksApi.create(data.payload, data.videoFile);
+        return howItWorksApi.create(data);
       }
     },
     onSuccess: (data) => {
@@ -48,7 +47,7 @@ const AdminHowItWorks = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    saveMutation.mutate({ payload: { title, description, videoUrl }, videoFile });
+    saveMutation.mutate({ title, description, videoUrl });
   };
 
   if (isLoading) return <Loader />;
@@ -75,17 +74,14 @@ const AdminHowItWorks = () => {
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-bold text-stone-600 uppercase">Video File (MP4)</label>
-            <div className="relative">
-              <input
-                type="file"
-                accept="video/mp4"
-                onChange={(e) => setVideoFile(e.target.files[0])}
-                className="w-full bg-stone-50 border border-stone-250 rounded-xl px-3.5 py-1.5 text-sm focus:outline-hidden focus:border-primary file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
-              />
-            </div>
-            {videoFile && <p className="text-[10px] text-stone-500 truncate pt-1">Selected: {videoFile.name}</p>}
-            {!videoFile && videoUrl && <p className="text-[10px] text-stone-500 truncate pt-1">Current URL: {videoUrl}</p>}
+            <label className="text-xs font-bold text-stone-600 uppercase">YouTube Video URL</label>
+            <input
+              type="url"
+              value={videoUrl}
+              onChange={(e) => setVideoUrl(e.target.value)}
+              placeholder="https://www.youtube.com/watch?v=..."
+              className="w-full bg-stone-50 border border-stone-250 rounded-xl px-3.5 py-2.5 text-sm focus:outline-hidden focus:border-primary"
+            />
           </div>
 
           <div className="space-y-1">

@@ -1,13 +1,29 @@
 import React from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 import { FiCheck } from 'react-icons/fi';
+import { orderApi } from '../api/orderApi';
+import Loader from '../components/Loader';
 
 const OrderSuccess = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const orderId = searchParams.get('orderId') || 'ORD-98234';
+  const orderId = searchParams.get('orderId');
+
+  const { data: order, isLoading } = useQuery({
+    queryKey: ['order', orderId],
+    queryFn: () => orderApi.getOrderById(orderId),
+    enabled: !!orderId,
+  });
+
+  if (isLoading) {
+    return <div className="py-20"><Loader /></div>;
+  }
+
+  const displayOrderId = order?.orderNumber || orderId || 'N/A';
+  const paymentMethod = order?.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Online Payment';
 
   return (
     <div className="max-w-md mx-auto px-4 py-20 text-center space-y-8 animate-float-up">
@@ -30,11 +46,11 @@ const OrderSuccess = () => {
       <div className="bg-white border border-stone-200/80 rounded-2xl p-5 shadow-xs divide-y divide-stone-100">
         <div className="pb-3 flex justify-between text-xs sm:text-sm font-semibold">
           <span className="text-stone-400">{t('orderId')}</span>
-          <span className="text-primary font-mono font-bold">{orderId}</span>
+          <span className="text-primary font-mono font-bold">{displayOrderId}</span>
         </div>
         <div className="pt-3 flex justify-between text-xs sm:text-sm font-semibold">
-          <span className="text-stone-400">Payment Status</span>
-          <span className="text-emerald-600 uppercase">Cash on Delivery</span>
+          <span className="text-stone-400">Payment Method</span>
+          <span className="text-emerald-600 uppercase">{paymentMethod}</span>
         </div>
       </div>
 

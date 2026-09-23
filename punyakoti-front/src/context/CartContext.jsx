@@ -73,7 +73,7 @@ export const CartProvider = ({ children }) => {
       try {
         await cartApi.addItem({
           productId: product.id,
-          variantId: weightOption.variantId || product.id, // backend expects variantId
+          variantId: weightOption.id || product.id, // backend expects variantId
           quantity: quantity,
         });
         // re-fetch cart

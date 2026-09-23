@@ -19,8 +19,12 @@ const ProductDetails = () => {
   const { t } = useTranslation();
   const { addToCart } = useCart();
 
-  const { data: product, isLoading: loading, error } = useQuery({
-    queryKey: ['product', id],
+  const {
+    data: product,
+    isLoading: loading,
+    error,
+  } = useQuery({
+    queryKey: ["product", id],
     queryFn: () => productApi.getProductById(id),
   });
 
@@ -30,16 +34,36 @@ const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
 
-  const productImages = product ? (product.media || []).filter(m => m.type === 'IMAGE').map(m => m.url) : [];
+  const productImages = product
+    ? (product.media || []).filter((m) => m.type === "IMAGE").map((m) => m.url)
+    : [];
   if (productImages.length === 0) {
-    productImages.push("https://images.unsplash.com/photo-1625228752485-f5036545c3c1?auto=format&fit=crop&q=80&w=800");
+    productImages.push(
+      "https://images.unsplash.com/photo-1625228752485-f5036545c3c1?auto=format&fit=crop&q=80&w=800",
+    );
   }
-  const productVideo = product ? (product.media || []).find(m => m.type === 'VIDEO')?.url : null;
-  const productVariants = product?.variants ? [...product.variants].sort((a,b)=>a.price-b.price) : [];
-  const productStock = product?.variants ? product.variants.reduce((s, v) => s + (v.stock || 0), 0) : 0;
-  const productBenefits = product?.benefits ? product.benefits.split("\n").map(s=>s.trim()).filter(Boolean) : ["Preservative free", "Rich organic fats"];
-  const productIngredients = product?.ingredients ? product.ingredients.split("\n").map(s=>s.trim()).filter(Boolean) : [];
-  
+  const productVideo = product
+    ? (product.media || []).find((m) => m.type === "VIDEO")?.url
+    : null;
+  const productVariants = product?.variants
+    ? [...product.variants].sort((a, b) => a.price - b.price)
+    : [];
+  const productStock = product?.variants
+    ? product.variants.reduce((s, v) => s + (v.stock || 0), 0)
+    : 0;
+  const productBenefits = product?.benefits
+    ? product.benefits
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : ["Preservative free", "Rich organic fats"];
+  const productIngredients = product?.ingredients
+    ? product.ingredients
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean)
+    : [];
+
   useEffect(() => {
     if (product) {
       if (productVariants.length > 0 && !selectedWeight) {
@@ -107,7 +131,7 @@ const ProductDetails = () => {
                 <img
                   src={activeMedia.url}
                   alt={product.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain p-4"
                 />
               </div>
             )}
@@ -176,7 +200,9 @@ const ProductDetails = () => {
                   />
                 ))}
               </div>
-              <span className="font-bold text-stone-700">{product.averageRating || 5.0}</span>
+              <span className="font-bold text-stone-700">
+                {product.averageRating || 5.0}
+              </span>
               <span className="text-stone-300">|</span>
               <span className="text-stone-500 font-medium">
                 {product.reviewCount || 0} verified reviews
@@ -223,7 +249,8 @@ const ProductDetails = () => {
                 >
                   <span className="block text-sm">{opt.weight}</span>
                   <span className="text-[10px] text-stone-400 font-medium">
-                    {opt.price >= productVariants[0].price ? "+" : ""}₹{opt.price - productVariants[0].price}
+                    {opt.price >= productVariants[0].price ? "+" : ""}₹
+                    {opt.price - productVariants[0].price}
                   </span>
                 </button>
               ))}
@@ -305,7 +332,12 @@ const ProductDetails = () => {
             {/* Tab Contents */}
             <div className="text-xs sm:text-sm text-stone-500 leading-relaxed min-h-[80px]">
               {activeTab === "description" && <p>{product.description}</p>}
-              {activeTab === "usage" && <p>{product.usageInstructions || "Consume as seasoning or cook directly."}</p>}
+              {activeTab === "usage" && (
+                <p>
+                  {product.usageInstructions ||
+                    "Consume as seasoning or cook directly."}
+                </p>
+              )}
               {activeTab === "ingredients" && (
                 <ul className="list-disc pl-5 space-y-1">
                   {productIngredients.map((ing, i) => (
@@ -319,18 +351,33 @@ const ProductDetails = () => {
                   {product.reviews && product.reviews.length > 0 ? (
                     <div className="space-y-4">
                       {product.reviews.map((rev) => (
-                        <div key={rev.id} className="border-b border-stone-100 pb-4 last:border-0">
+                        <div
+                          key={rev.id}
+                          className="border-b border-stone-100 pb-4 last:border-0"
+                        >
                           <div className="flex items-center justify-between mb-2">
-                            <div className="font-bold text-stone-800">{rev.userName || 'Anonymous'}</div>
+                            <div className="font-bold text-stone-800">
+                              {rev.userName || "Anonymous"}
+                            </div>
                             <div className="flex text-amber-400">
                               {Array.from({ length: 5 }).map((_, i) => (
-                                <FiStar key={i} className={`w-3 h-3 ${i < rev.rating ? "fill-amber-400" : "text-stone-200"}`} />
+                                <FiStar
+                                  key={i}
+                                  className={`w-3 h-3 ${i < rev.rating ? "fill-amber-400" : "text-stone-200"}`}
+                                />
                               ))}
                             </div>
                           </div>
                           <p className="text-stone-600">{rev.comment}</p>
                           {rev.videoUrl && (
-                            <a href={rev.videoUrl} target="_blank" rel="noopener noreferrer" className="text-primary text-xs mt-2 inline-block">View attached video</a>
+                            <a
+                              href={rev.videoUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary text-xs mt-2 inline-block"
+                            >
+                              View attached video
+                            </a>
                           )}
                         </div>
                       ))}
@@ -338,7 +385,7 @@ const ProductDetails = () => {
                   ) : (
                     <p>No reviews yet. Be the first to review this product!</p>
                   )}
-                  
+
                   {/* Review Form - Needs auth state */}
                   <ReviewForm productId={product.id} />
                 </div>
@@ -356,7 +403,7 @@ const ReviewForm = ({ productId }) => {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [videoFile, setVideoFile] = useState(null);
-  
+
   const { mutate: submitReview, isPending } = useMutation({
     mutationFn: (data) => reviewApi.createReview(data.payload, data.file),
     onSuccess: () => {
@@ -365,13 +412,15 @@ const ReviewForm = ({ productId }) => {
       setComment("");
       setVideoFile(null);
     },
-    onError: () => toast.error("Failed to submit review")
+    onError: () => toast.error("Failed to submit review"),
   });
 
   if (!user) {
     return (
       <div className="bg-stone-50 p-4 rounded-xl text-center border border-stone-200 mt-4">
-        <p className="text-sm font-medium text-stone-600 mb-2">Please log in to write a review.</p>
+        <p className="text-sm font-medium text-stone-600 mb-2">
+          Please log in to write a review.
+        </p>
       </div>
     );
   }
@@ -382,31 +431,62 @@ const ReviewForm = ({ productId }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-stone-50 p-5 rounded-2xl border border-stone-200 space-y-4 mt-6">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-stone-50 p-5 rounded-2xl border border-stone-200 space-y-4 mt-6"
+    >
       <h4 className="font-bold text-stone-800 text-sm">Write a Review</h4>
-      
+
       <div>
-        <label className="block text-xs font-bold text-stone-600 uppercase mb-1">Rating</label>
+        <label className="block text-xs font-bold text-stone-600 uppercase mb-1">
+          Rating
+        </label>
         <div className="flex gap-1">
-          {[1,2,3,4,5].map(star => (
-            <button type="button" key={star} onClick={() => setRating(star)} className="focus:outline-hidden">
-              <FiStar className={`w-5 h-5 ${star <= rating ? "fill-amber-400 text-amber-400" : "text-stone-300"}`} />
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              type="button"
+              key={star}
+              onClick={() => setRating(star)}
+              className="focus:outline-hidden"
+            >
+              <FiStar
+                className={`w-5 h-5 ${star <= rating ? "fill-amber-400 text-amber-400" : "text-stone-300"}`}
+              />
             </button>
           ))}
         </div>
       </div>
 
       <div>
-        <label className="block text-xs font-bold text-stone-600 uppercase mb-1">Comment</label>
-        <textarea required value={comment} onChange={e => setComment(e.target.value)} rows="3" className="w-full bg-white border border-stone-250 rounded-xl px-3 py-2 text-sm focus:outline-hidden focus:border-primary"></textarea>
+        <label className="block text-xs font-bold text-stone-600 uppercase mb-1">
+          Comment
+        </label>
+        <textarea
+          required
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          rows="3"
+          className="w-full bg-white border border-stone-250 rounded-xl px-3 py-2 text-sm focus:outline-hidden focus:border-primary"
+        ></textarea>
       </div>
 
       <div>
-        <label className="block text-xs font-bold text-stone-600 uppercase mb-1">Attach Video (Optional)</label>
-        <input type="file" accept="video/mp4,video/webm" onChange={e => setVideoFile(e.target.files[0])} className="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20" />
+        <label className="block text-xs font-bold text-stone-600 uppercase mb-1">
+          Attach Video (Optional)
+        </label>
+        <input
+          type="file"
+          accept="video/mp4,video/webm"
+          onChange={(e) => setVideoFile(e.target.files[0])}
+          className="w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+        />
       </div>
 
-      <button type="submit" disabled={isPending} className="px-5 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:bg-primary-dark disabled:opacity-50">
+      <button
+        type="submit"
+        disabled={isPending}
+        className="px-5 py-2.5 bg-primary text-white text-sm font-bold rounded-xl hover:bg-primary-dark disabled:opacity-50"
+      >
         {isPending ? "Submitting..." : "Submit Review"}
       </button>
     </form>

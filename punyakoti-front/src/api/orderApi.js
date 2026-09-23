@@ -37,8 +37,8 @@ export const orderApi = {
     };
   },
 
-  createOrder: async (addressId) => {
-    const response = await axiosInstance.post("/orders", { addressId });
+  getOrderById: async (id) => {
+    const response = await axiosInstance.get(`/orders/${id}`);
     return response.data?.data || response.data;
   },
 

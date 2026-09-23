@@ -7,6 +7,7 @@ import {
   FiBox,
   FiDollarSign,
   FiClock,
+  FiMessageSquare,
 } from "react-icons/fi";
 
 const Admin = () => {
@@ -15,14 +16,17 @@ const Admin = () => {
       totalUsers: 0,
       totalOrders: 0,
       totalProducts: 0,
-      monthlySales: "₹0",
+      pendingReviews: 0,
+      dailySales: 0,
+      weeklySales: 0,
+      monthlySales: 0,
+      totalSales: 0,
       recentLogins: [],
     },
   } = useQuery({
     queryKey: ["dashboardStats"],
     queryFn: adminApi.getDashboardStats,
   });
-  // console.log(dashboardStats);
 
   const stats = [
     {
@@ -44,8 +48,32 @@ const Admin = () => {
       color: "bg-purple-500/10 text-purple-600",
     },
     {
+      name: "Pending Reviews",
+      value: dashboardStats.pendingReviews,
+      icon: FiMessageSquare,
+      color: "bg-rose-500/10 text-rose-600",
+    },
+    {
+      name: "Daily Sales",
+      value: `₹${dashboardStats.dailySales || 0}`,
+      icon: FiDollarSign,
+      color: "bg-amber-500/10 text-amber-600",
+    },
+    {
+      name: "Weekly Sales",
+      value: `₹${dashboardStats.weeklySales || 0}`,
+      icon: FiDollarSign,
+      color: "bg-amber-500/10 text-amber-600",
+    },
+    {
       name: "Monthly Sales",
-      value: dashboardStats.monthlySales,
+      value: `₹${dashboardStats.monthlySales || 0}`,
+      icon: FiDollarSign,
+      color: "bg-amber-500/10 text-amber-600",
+    },
+    {
+      name: "Total Sales",
+      value: `₹${dashboardStats.totalSales || 0}`,
       icon: FiDollarSign,
       color: "bg-amber-500/10 text-amber-600",
     },

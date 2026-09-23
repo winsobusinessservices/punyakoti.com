@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #3874FF;
-  --color-primary-light: #F4CEFF;
-  --color-primary-dark: #03045e;
-  --color-secondary: #fbbd13;
-  --color-accent: #1f9d55;
-  --color-warm-bg: #f8fafc;
+  --color-primary: #D4AF37;
+  --color-primary-light: #F3E5AB;
+  --color-primary-dark: #AA8C2C;
+  --color-secondary: #6B7280;
+  --color-accent: #D4AF37;
+  --color-warm-bg: #f9fafb;
   --color-warm-card: #ffffff;
   
   --font-sans: 'Nunito', sans-serif;
@@ -20,6 +20,28 @@
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+.animate-marquee {
+  white-space: nowrap;
+  animation: marquee 25s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 @layer base {
@@ -88,6 +110,6 @@
 }
 
 .custom-pagination .swiper-pagination-bullet-active {
-  background: #1f9d55 !important;
+  background: #D4AF37 !important;
   width: 20px !important;
 }

@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { productApi } from "../api/productApi";
+import { categoryApi } from "../api/categoryApi";
 import ProductCard from "../components/ProductCard";
 import SearchBar from "../components/SearchBar";
 import Loader from "../components/Loader";
@@ -13,25 +14,44 @@ const Products = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get("category") || "";
-  const [searchQuery, setSearchQuery] = useState("");
+  const searchQuery = searchParams.get("search") || "";
 
   const { data: products = [], isLoading: loading } = useQuery({
     queryKey: ["products"],
     queryFn: productApi.getProducts,
   });
 
-  const handleCategoryChange = (categorySlug) => {
-    if (categorySlug) {
-      setSearchParams({ category: categorySlug });
-    } else {
-      setSearchParams({});
-    }
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: categoryApi.getCategories,
+  });
+
+  const handleCategoryChange = (categoryId) => {
+    setSearchParams((prev) => {
+      if (categoryId) {
+        prev.set("category", categoryId);
+      } else {
+        prev.delete("category");
+      }
+      return prev;
+    });
+  };
+
+  const handleSearchChange = (val) => {
+    setSearchParams((prev) => {
+      if (val) {
+        prev.set("search", val);
+      } else {
+        prev.delete("search");
+      }
+      return prev;
+    });
   };
 
   // Filter products based on search and category
   const filteredProducts = products.filter((prod) => {
     const matchesCategory = activeCategory
-      ? prod.category?.slug === activeCategory
+      ? String(prod.category?.id) === activeCategory
       : true;
     const matchesSearch =
       prod.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -60,7 +80,7 @@ const Products = () => {
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
           <SearchBar
             value={searchQuery}
-            onChange={setSearchQuery}
+            onChange={handleSearchChange}
             placeholder="Search product catalogue..."
           />
         </div>
@@ -78,33 +98,26 @@ const Products = () => {
         >
           All Categories
         </button>
-        <button
-          onClick={() => handleCategoryChange("cow-products")}
-          className={`px-5 py-2.5 rounded-xl font-semibold text-xs transition-all shadow-xs ${
-            activeCategory === "cow-products"
-              ? "bg-primary text-white"
-              : "bg-white border border-stone-200 text-stone-600 hover:bg-stone-50"
-          }`}
-        >
-          {t("cowProducts")}
-        </button>
-        <button
-          onClick={() => handleCategoryChange("buffalo-products")}
-          className={`px-5 py-2.5 rounded-xl font-semibold text-xs transition-all shadow-xs ${
-            activeCategory === "buffalo-products"
-              ? "bg-primary text-white"
-              : "bg-white border border-stone-200 text-stone-600 hover:bg-stone-50"
-          }`}
-        >
-          {t("buffaloProducts")}
-        </button>
+        {categories.map((cat) => (
+          <button
+            key={cat.id}
+            onClick={() => handleCategoryChange(String(cat.id))}
+            className={`px-5 py-2.5 rounded-xl font-semibold text-xs transition-all shadow-xs ${
+              activeCategory === String(cat.id)
+                ? "bg-primary text-white"
+                : "bg-white border border-stone-200 text-stone-600 hover:bg-stone-50"
+            }`}
+          >
+            {cat.name}
+          </button>
+        ))}
       </div>
 
       {/* Product List Grid */}
       {loading ? (
         <Loader type="skeleton-card" count={3} />
       ) : filteredProducts.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {filteredProducts.map((prod) => (
             <ProductCard key={prod.id} product={prod} />
           ))}

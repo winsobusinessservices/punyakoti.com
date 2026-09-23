@@ -12,6 +12,8 @@ import {
   FiX,
   FiShield,
 } from "react-icons/fi";
+import { FaPhone, FaSearch, FaUser } from "react-icons/fa";
+import { GiCaptainHatProfile, GiRamProfile } from "react-icons/gi";
 
 const Navbar = () => {
   const { isAuthenticated, role, logout } = useAuth();
@@ -30,107 +32,147 @@ const Navbar = () => {
   const navLinks = [
     { label: t("home"), path: "/" },
     { label: t("products"), path: "/products" },
-    { label: t("cart"), path: "/cart", isCart: true },
-    { label: t("profile"), path: "/profile" },
+    // { label: t("cart"), path: "/cart", isCart: true },
+    { label: t("About Us"), path: "/about" },
+    // { label: t("profile"), path: "/profile" },
+    { label: t("Blogs"), path: "/blogs" },
+    { label: t("contact"), path: "/contact" },
   ];
 
   return (
     <>
-      <nav className="bg-[#E5A416] backdrop-blur-md border-b border-stone-200 sticky top-0 z-30 shadow-xs rounded-xl mx-5 mt-3">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-white ">
-              <img
-                src="/punyakoti-logo.jpeg"
-                alt={t("brandName")}
-                className="w-full h-full object-contain"
-              />
+      <nav className="bg-white/95 backdrop-blur-md border-b border-stone-200 sticky top-0 z-30 shadow-xs rounded-xl mx-5 mt-3">
+        <div className="px-4 sm:px-6 lg:px-16">
+          <div className="flex justify-between h-16 items-center">
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-2.5 shrink-0">
+              <div className="rounded-full flex items-center justify-center font-bold">
+                <img
+                  src="/icon.png"
+                  alt={t("brandName")}
+                  className="w-14 h-14 sm:w-20 sm:h-20 object-contain"
+                />
+                <div className="flex flex-col items-center hidden sm:flex">
+                  <span className="text-xl sm:text-2xl font-display font-bold tracking-wide text-primary-dark">
+                    {t("brandName")}
+                  </span>
+                  <p className="text-[10px] sm:text-xs font-display font-light tracking-wider text-primary-dark">
+                    Pure By Nature
+                  </p>
+                </div>
+              </div>
+            </Link>
+
+            {/* Desktop Nav links */}
+            <div className="hidden md:flex items-center gap-6">
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`text-sm font-semibold transition-all relative py-1 hover:text-primary ${
+                      isActive ? "text-primary" : "text-stone-600"
+                    }`}
+                  >
+                    {link.label}
+                    {isActive && (
+                      <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full"></span>
+                    )}
+                  </Link>
+                );
+              })}
+              <div className="relative">
+                <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 w-4 h-4" />
+                <input
+                  type="text"
+                  placeholder={t("search")}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && e.target.value.trim()) {
+                      navigate(`/products?search=${encodeURIComponent(e.target.value.trim())}`);
+                    }
+                  }}
+                  className="pl-10 pr-4 py-1 w-52 rounded-xl bg-white border border-stone-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                />
+              </div>
             </div>
-            {/* <span className="text-xl font-display font-bold tracking-wide text-primary-dark">
-              {t("brandName")}
-            </span> */}
-          </Link>
 
-          {/* Desktop Nav links */}
-          <div className="hidden md:flex items-center gap-6">
-            {navLinks.map((link) => {
-              const isActive = location.pathname === link.path;
-              return (
+            {/* Desktop Right actions */}
+            <div className="hidden md:flex items-center gap-4">
+              <LanguageSelector />
+
+              {role === "Admin" && (
                 <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`text-sm font-semibold transition-all relative py-1 hover:text-primary ${
-                    isActive ? "text-primary" : "text-white"
-                  }`}
+                  to="/admin"
+                  className="flex items-center gap-1.5 text-xs font-semibold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-xl transition-all"
+                  title="Admin Panel"
                 >
-                  {link.label}
-                  {link.isCart && cartTotalCount > 0 && (
-                    <span className="absolute -top-2.5 -right-3.5 bg-secondary text-primary-dark text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-xs">
-                      {cartTotalCount}
-                    </span>
-                  )}
-                  {isActive && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full"></span>
-                  )}
+                  <FiShield className="w-3.5 h-3.5" />
+                  <span>{t("admin")}</span>
                 </Link>
-              );
-            })}
-          </div>
-
-          {/* Desktop Right actions */}
-          <div className="hidden md:flex items-center gap-4">
-            <LanguageSelector />
-
-            {role === "Admin" && (
-              <Link
-                to="/admin"
-                className="flex items-center gap-1.5 text-xs font-semibold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-3 py-1.5 rounded-xl transition-all"
-                title="Admin Panel"
-              >
-                <FiShield className="w-3.5 h-3.5" />
-                <span>{t("admin")}</span>
-              </Link>
-            )}
-
-            {isAuthenticated ? (
-              <button
-                onClick={handleLogout}
-                className="text-stone-500 hover:text-rose-600 bg-stone-100 hover:bg-rose-50 p-2 rounded-xl transition-all"
-                title={t("logout")}
-                aria-label="Logout"
-              >
-                <FiLogOut className="w-4 h-4" />
-              </button>
-            ) : (
-              <Link
-                to="/login"
-                className="text-stone-600 hover:text-primary font-semibold text-sm"
-              >
-                Sign In
-              </Link>
-            )}
-          </div>
-
-          {/* Mobile hamburger */}
-          <div className="md:hidden flex items-center gap-2">
-            <LanguageSelector />
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className="text-stone-600 p-2 hover:bg-stone-100 rounded-xl transition-all"
-              aria-label="Toggle mobile menu"
-            >
-              {mobileOpen ? (
-                <FiX className="w-6 h-6" />
-              ) : (
-                <FiMenu className="w-6 h-6" />
               )}
-            </button>
+
+              {isAuthenticated ? (
+                <button
+                  onClick={handleLogout}
+                  className="text-stone-500 hover:text-rose-600 bg-stone-100 hover:bg-rose-50 p-2 rounded-xl transition-all"
+                  title={t("logout")}
+                  aria-label="Logout"
+                >
+                  <FiLogOut className="w-4 h-4" />
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  className="text-stone-600 hover:text-primary font-semibold text-sm"
+                >
+                  Sign In
+                </Link>
+              )}
+
+              {isAuthenticated && (
+                <span className="flex gap-3 items-center">
+                  <Link
+                    to="/cart"
+                    className="flex relative items-center gap-1.5 text-xs font-semibold text-emerald-800 bg-white border border-stone-200 hover:bg-emerald-200 p-2 rounded-full transition-all"
+                    title="Cart"
+                  >
+                    <FiShoppingCart className="w-4 h-4" />
+                    {/* <span className="text-sm">{t("cart")}</span> */}
+                    {cartTotalCount > 0 && (
+                      <span className="absolute -top-2.5 -right-3.5 bg-secondary text-primary-dark text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-xs">
+                        {cartTotalCount}
+                      </span>
+                    )}
+                  </Link>
+                  <Link
+                    to="/profile"
+                    className="text-stone-600 hover:text-primary font-semibold text-sm bg-white border border-stone-200 hover:bg-emerald-200 p-2 rounded-full transition-all"
+                  >
+                    <FaUser className="w-4 h-4" />
+                  </Link>
+                </span>
+              )}
+            </div>
+
+            {/* Mobile hamburger */}
+            <div className="md:hidden flex items-center gap-2">
+              <LanguageSelector />
+              <button
+                onClick={() => setMobileOpen(!mobileOpen)}
+                className="text-stone-600 p-2 hover:bg-stone-100 rounded-xl transition-all"
+                aria-label="Toggle mobile menu"
+              >
+                {mobileOpen ? (
+                  <FiX className="w-6 h-6" />
+                ) : (
+                  <FiMenu className="w-6 h-6" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
 
       {/* Mobile Drawer Overlay & Menu (Outside of nav to avoid containing block issues from backdrop-blur) */}
       <div

@@ -1,26 +1,32 @@
 import React, { useState } from 'react';
-import { FiChevronDown } from 'react-icons/fi';
+import { FiPlusCircle, FiMinusCircle } from 'react-icons/fi';
 
 const FAQAccordion = ({ question, answer }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="border border-stone-200/80 bg-white rounded-2xl overflow-hidden transition-all duration-300 shadow-xs hover:shadow-md">
+    <div className="border-b border-gray-200">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-5 text-left font-display font-medium text-stone-800 hover:text-primary transition-colors focus:outline-hidden"
+        className="w-full flex items-center justify-between py-6 text-left font-display font-medium focus:outline-none group"
         aria-expanded={isOpen}
       >
-        <span className="text-sm md:text-base leading-snug">{question}</span>
-        <FiChevronDown className={`w-5 h-5 text-stone-400 transition-transform duration-300 shrink-0 ml-4 ${isOpen ? 'rotate-180 text-primary' : ''}`} />
+        <span className={`text-base md:text-lg leading-snug transition-colors duration-300 ${isOpen ? 'text-primary' : 'text-gray-900 group-hover:text-primary'}`}>
+          {question}
+        </span>
+        {isOpen ? (
+          <FiMinusCircle className="w-5 h-5 text-gray-500 shrink-0 ml-4" />
+        ) : (
+          <FiPlusCircle className="w-5 h-5 text-gray-500 shrink-0 ml-4 group-hover:text-primary transition-colors duration-300" />
+        )}
       </button>
 
       <div
         className={`transition-all duration-300 ease-in-out ${
-          isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+          isOpen ? 'max-h-[500px] opacity-100 mb-6' : 'max-h-0 opacity-0'
         } overflow-hidden`}
       >
-        <div className="px-5 pb-5 pt-1 text-sm text-stone-500 leading-relaxed border-t border-stone-100 bg-stone-50/30">
+        <div className="text-sm md:text-base text-gray-500 leading-relaxed max-w-3xl">
           {answer}
         </div>
       </div>

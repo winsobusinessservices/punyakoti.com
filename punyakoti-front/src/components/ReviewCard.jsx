@@ -8,16 +8,16 @@ const ReviewCard = ({ review, index = 0 }) => {
   // Exact mockup image card background colors and quote circle themes
   const themes = [
     {
-      cardBg: "bg-[#FFF9E6]", // Card 1: Warm light yellow
-      quoteBg: "bg-[#F5B041]", // Yellowish-Orange quote circle
+      cardBg: "bg-white",
+      quoteBg: "bg-gray-100",
     },
     {
-      cardBg: "bg-[#EBF5FB]", // Card 2: Light sky blue
-      quoteBg: "bg-[#2980B9]", // Blue quote circle
+      cardBg: "bg-gray-50",
+      quoteBg: "bg-blue-50",
     },
     {
-      cardBg: "bg-[#FDEDEC]", // Card 3: Light rose pink
-      quoteBg: "bg-[#EC7063]", // Coral pink quote circle
+      cardBg: "bg-stone-50",
+      quoteBg: "bg-gray-200",
     },
   ];
 
@@ -55,7 +55,7 @@ const ReviewCard = ({ review, index = 0 }) => {
               <span
                 key={i}
                 className={`text-xl leading-none ${
-                  i < review.rating ? "text-[#F5B041]" : "text-stone-300"
+                  i < review.rating ? "text-primary" : "text-stone-300"
                 }`}
               >
                 ★
@@ -63,13 +63,16 @@ const ReviewCard = ({ review, index = 0 }) => {
             ))}
           </div>
         </div>
-
         {/* Video review (embedded inline if video is present) */}
         {review.videoUrl && (
-          <div className="mb-5 relative w-full overflow-hidden select-none">
+          <div className="mb-5 relative w-full overflow-hidden swiper-no-swiping">
             <VideoPlayer
               url={review.videoUrl}
               className="rounded-2xl border-0 shadow-xs"
+              controls={true}
+              autoPlay={false}
+              muted={false}
+              loop={false}
             />
           </div>
         )}
@@ -83,13 +86,13 @@ const ReviewCard = ({ review, index = 0 }) => {
       {/* User Information Footer */}
       <div className="mt-8 pt-5 border-t border-stone-200/40 flex items-center gap-3">
         <img
-          src={`https://ui-avatars.com/api/?name=${review.userName || 'Anonymous'}&background=random`}
-          alt={review.userName || 'Anonymous'}
+          src={`https://ui-avatars.com/api/?name=${review.userName || "Anonymous"}&background=random`}
+          alt={review.userName || "Anonymous"}
           className="w-11 h-11 rounded-full object-cover border border-stone-200/80 shadow-xs"
         />
         <div className="text-left">
           <h4 className="font-display font-extrabold text-stone-850 text-xs sm:text-sm leading-none">
-            {review.userName || 'Anonymous'}
+            {review.userName || "Anonymous"}
           </h4>
           <span className="text-[10px] text-stone-400 font-semibold mt-1.5 inline-block">
             {userLocation}

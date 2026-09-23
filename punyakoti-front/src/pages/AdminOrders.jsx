@@ -82,6 +82,7 @@ const AdminOrders = () => {
                   <th className="px-6 py-4">Products</th>
                   <th className="px-6 py-4">Amount</th>
                   <th className="px-6 py-4">Date</th>
+                  <th className="px-6 py-4">Payment</th>
                   <th className="px-6 py-4">Status</th>
                 </tr>
               </thead>
@@ -126,9 +127,30 @@ const AdminOrders = () => {
                         : ""}
                     </td>
                     <td className="px-6 py-4">
+                      <div className="flex flex-col gap-1">
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full w-fit ${
+                          order.paymentMethod === 'COD' 
+                            ? 'bg-amber-100 text-amber-800 border border-amber-200' 
+                            : 'bg-indigo-100 text-indigo-800 border border-indigo-200'
+                        }`}>
+                          {order.paymentMethod === 'COD' ? 'COD' : 'ONLINE'}
+                        </span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full w-fit ${
+                          order.paymentStatus === 'SUCCESS' || order.paymentStatus === 'PAID'
+                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                            : order.paymentStatus === 'PENDING'
+                            ? 'bg-stone-100 text-stone-800 border border-stone-200'
+                            : 'bg-rose-100 text-rose-800 border border-rose-200'
+                        }`}>
+                          {order.paymentStatus || 'PENDING'}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
                       {order?.status === "PENDING" &&
                       order?.paymentStatus !== "SUCCESS" &&
-                      order?.paymentStatus !== "PAID" ? (
+                      order?.paymentStatus !== "PAID" &&
+                      order?.paymentMethod !== "COD" ? (
                         <span className="text-xs font-bold border-2 border-rose-200 bg-rose-50 text-rose-800 rounded-xl px-2.5 py-1.5 inline-block">
                           Unpaid / Abandoned
                         </span>
