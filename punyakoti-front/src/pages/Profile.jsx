@@ -330,7 +330,7 @@ const Profile = () => {
             </div>
           </div>
 
-          <div className="flex lg:flex-col gap-2 text-sm font-semibold overflow-x-auto hide-scrollbar">
+          <div className="flex flex-wrap lg:flex-col gap-2 text-sm font-semibold">
             <button
               onClick={() => setActiveTab("orders")}
               className={`w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap shrink-0 ${activeTab === "orders" ? "bg-primary text-white" : "text-stone-600 hover:bg-stone-50"}`}
