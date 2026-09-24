@@ -78,9 +78,9 @@ const AdminAbandonedCarts = () => {
                             key={idx}
                             className="text-xs text-stone-500 font-medium truncate"
                           >
-                            {item.productName}{" "}
+                            {item.product.name}
                             <span className="text-stone-400">
-                              ({item.variantWeight} x{item.quantity})
+                              ({item.variant.weight} x{item.quantity})
                             </span>
                           </div>
                         ))}

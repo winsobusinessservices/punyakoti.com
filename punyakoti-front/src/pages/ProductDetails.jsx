@@ -128,7 +128,7 @@ const ProductDetails = () => {
             {activeMedia.type === "video" ? (
               <VideoPlayer
                 url={activeMedia.url}
-                controls={true}
+                controls={false}
                 autoPlay={true}
                 mutate={false}
                 className="shadow-lg"

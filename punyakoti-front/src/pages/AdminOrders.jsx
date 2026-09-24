@@ -4,9 +4,11 @@ import { orderApi } from "../api/orderApi";
 import { FiShoppingBag, FiSearch } from "react-icons/fi";
 import Loader from "../components/Loader";
 import toast from "react-hot-toast";
+import AdminOrderDetailsModal from "../components/AdminOrderDetailsModal";
 
 const AdminOrders = () => {
   const queryClient = useQueryClient();
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   const [page, setPage] = useState(0);
@@ -92,18 +94,27 @@ const AdminOrders = () => {
                     key={order.id}
                     className="hover:bg-stone-50/50 transition-colors"
                   >
-                    <td className="px-6 py-4 font-mono font-bold text-stone-850">
+                    <td onClick={() => setSelectedOrder(order)} className="px-6 py-4 font-mono font-bold text-primary cursor-pointer">
                       {order.orderNumber || order.id}
+                      {/* <div className="text-[9px] text-stone-400 font-sans mt-0.5 font-normal">Click to view</div> */}
                     </td>
-                    <td className="px-6 py-4">
+                    <td onClick={() => setSelectedOrder(order)} className="px-6 py-4 cursor-pointer">
                       <div className="font-semibold text-stone-800">
-                        {order.address?.fullName || "Guest Farmer"}
+                        {order?.name}
                       </div>
-                      <span className="text-[10px] text-stone-400 font-mono">
-                        +91 {order.address?.phoneNumber || "9988776655"}
-                      </span>
+                      <div className="text-[10px] text-stone-400 font-mono mb-1">
+                        +91 {order?.phoneNumber }
+                      </div>
+                      {order?.address && (
+                        <div className="text-[10px] text-stone-500 leading-tight max-w-[180px]">
+                          {order.address.line1}
+                          {order.address.line2 && `, ${order.address.line2}`}
+                          <br />
+                          {order.address.city}, {order.address.state} - {order.address.postalCode}
+                        </div>
+                      )}
                     </td>
-                    <td className="px-6 py-4">
+                    <td onClick={() => setSelectedOrder(order)} className="px-6 py-4 cursor-pointer">
                       <div className="space-y-1 max-w-[200px] sm:max-w-xs">
                         {(order.items || []).map((item, idx) => (
                           <div
@@ -118,15 +129,15 @@ const AdminOrders = () => {
                         ))}
                       </div>
                     </td>
-                    <td className="px-6 py-4 font-bold text-stone-800">
+                    <td onClick={() => setSelectedOrder(order)} className="px-6 py-4 font-bold text-stone-800 cursor-pointer">
                       ₹{order.total}
                     </td>
-                    <td className="px-6 py-4 text-stone-500">
+                    <td onClick={() => setSelectedOrder(order)} className="px-6 py-4 text-stone-500 cursor-pointer">
                       {order.createdAt
                         ? new Date(order.createdAt).toISOString().split("T")[0]
                         : ""}
                     </td>
-                    <td className="px-6 py-4">
+                    <td onClick={() => setSelectedOrder(order)} className="px-6 py-4 cursor-pointer">
                       <div className="flex flex-col gap-1">
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full w-fit ${
                           order.paymentMethod === 'COD' 
@@ -211,6 +222,13 @@ const AdminOrders = () => {
             Next
           </button>
         </div>
+      )}
+
+      {selectedOrder && (
+        <AdminOrderDetailsModal 
+          order={selectedOrder} 
+          onClose={() => setSelectedOrder(null)} 
+        />
       )}
     </div>
   );
