@@ -39,10 +39,13 @@ public class LocalMediaServiceImpl implements MediaService {
             }
 
             String filename = UUID.randomUUID() + extension;
-            Path uploadDir = Paths.get(basePath, folder);
+            Path uploadDir = Paths.get(basePath, folder).toAbsolutePath().normalize();
             File dir = uploadDir.toFile();
             if (!dir.exists()) {
-                dir.mkdirs();
+                boolean created = dir.mkdirs();
+                if (!created && !dir.exists()) {
+                    throw new IOException("Could not create directory: " + uploadDir);
+                }
             }
 
             Path destination = uploadDir.resolve(filename);

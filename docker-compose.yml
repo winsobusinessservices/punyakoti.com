@@ -58,7 +58,7 @@ services:
       timeout: 5s
       retries: 10
     volumes:
-      - ./punyakoti-back/uploads:/app/uploads
+      - ./upload:/app/uploads
 
   # ---------------- React/Vite Frontend ----------------
   agri-frontend:
