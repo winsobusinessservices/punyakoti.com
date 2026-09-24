@@ -12,16 +12,17 @@ import org.mapstruct.Mapping;
 public interface OrderMapper {
 
     @Mapping(target = "address", expression = "java(toAddressDto(order))")
+    @Mapping(target = "name", source = "user.name")
+    @Mapping(target = "phoneNumber", source = "user.mobileNumber")
     OrderResponse toResponse(Order order);
 
     @Mapping(target = "price", source = "unitPrice")
+    @Mapping(target = "productId", source = "variant.product.id")
     OrderItemResponse toItemResponse(OrderItem item);
 
     default AddressDto toAddressDto(Order order) {
         return new AddressDto(
                 null,
-                order.getShipFullName(),
-                order.getShipPhone(),
                 order.getShipLine1(),
                 order.getShipLine2(),
                 order.getShipCity(),

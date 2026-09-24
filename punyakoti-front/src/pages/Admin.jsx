@@ -79,6 +79,27 @@ const Admin = () => {
     },
   ];
 
+  const salesTrend = dashboardStats.salesTrend && dashboardStats.salesTrend.length === 7 
+    ? dashboardStats.salesTrend 
+    : Array(7).fill({ month: "-", revenue: 0 });
+  
+  const maxRevenue = Math.max(...salesTrend.map((s) => s.revenue), 100);
+
+  const getCoordinates = (index, revenue) => {
+    const x = 70 + index * 100;
+    const y = 170 - (revenue / maxRevenue) * 150;
+    return { x, y };
+  };
+
+  const pathD =
+    "M " +
+    salesTrend
+      .map((s, index) => {
+        const { x, y } = getCoordinates(index, s.revenue);
+        return `${x} ${y}`;
+      })
+      .join(" L ");
+
   return (
     <div className="space-y-8 text-left">
       <div>
@@ -165,10 +186,9 @@ const Admin = () => {
                 strokeWidth="1.5"
               />
 
-              {/* Line path mapping to sales data points: Jan: 120k, Feb: 145k, Mar: 190k, Apr: 170k, May: 220k, Jun: 280k, Jul: 310k */}
-              {/* Coordinates computed relative to grid */}
+              {/* Line path mapping to real sales data points */}
               <path
-                d="M 70 140 L 170 120 L 270 90 L 370 100 L 470 70 L 570 40 L 670 20"
+                d={pathD}
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="4"
@@ -177,106 +197,36 @@ const Admin = () => {
               />
 
               {/* Data points dots */}
-              <circle
-                cx="70"
-                cy="140"
-                r="5"
-                className="fill-secondary stroke-primary stroke-2"
-              />
-              <circle
-                cx="170"
-                cy="120"
-                r="5"
-                className="fill-secondary stroke-primary stroke-2"
-              />
-              <circle
-                cx="270"
-                cy="90"
-                r="5"
-                className="fill-secondary stroke-primary stroke-2"
-              />
-              <circle
-                cx="370"
-                cy="100"
-                r="5"
-                className="fill-secondary stroke-primary stroke-2"
-              />
-              <circle
-                cx="470"
-                cy="70"
-                r="5"
-                className="fill-secondary stroke-primary stroke-2"
-              />
-              <circle
-                cx="570"
-                cy="40"
-                r="5"
-                className="fill-secondary stroke-primary stroke-2"
-              />
-              <circle
-                cx="670"
-                cy="20"
-                r="5"
-                className="fill-secondary stroke-primary stroke-2"
-              />
+              {salesTrend.map((s, i) => {
+                const { x, y } = getCoordinates(i, s.revenue);
+                return (
+                  <circle
+                    key={`circle-${i}`}
+                    cx={x}
+                    cy={y}
+                    r="5"
+                    className="fill-secondary stroke-primary stroke-2 hover:r-7 transition-all cursor-pointer"
+                  >
+                    <title>{`${s.month}: ₹${s.revenue}`}</title>
+                  </circle>
+                );
+              })}
 
               {/* Month Labels */}
-              <text
-                x="70"
-                y="192"
-                textAnchor="middle"
-                className="text-[10px] fill-stone-400 font-bold"
-              >
-                Jan
-              </text>
-              <text
-                x="170"
-                y="192"
-                textAnchor="middle"
-                className="text-[10px] fill-stone-400 font-bold"
-              >
-                Feb
-              </text>
-              <text
-                x="270"
-                y="192"
-                textAnchor="middle"
-                className="text-[10px] fill-stone-400 font-bold"
-              >
-                Mar
-              </text>
-              <text
-                x="370"
-                y="192"
-                textAnchor="middle"
-                className="text-[10px] fill-stone-400 font-bold"
-              >
-                Apr
-              </text>
-              <text
-                x="470"
-                y="192"
-                textAnchor="middle"
-                className="text-[10px] fill-stone-400 font-bold"
-              >
-                May
-              </text>
-              <text
-                x="570"
-                y="192"
-                textAnchor="middle"
-                className="text-[10px] fill-stone-400 font-bold"
-              >
-                Jun
-              </text>
-              <text
-                x="670"
-                y="192"
-                textAnchor="middle"
-                className="text-[10px] fill-stone-400 font-bold"
-              >
-                Jul
-              </text>
+              {salesTrend.map((s, i) => {
+                const x = 70 + i * 100;
+                return (
+                  <text
+                    key={`text-${i}`}
+                    x={x}
+                    y="192"
+                    textAnchor="middle"
+                    className="text-[10px] fill-stone-400 font-bold"
+                  >
+                    {s.month}
+                  </text>
+                );
+              })}
             </svg>
           </div>
         </div>

@@ -3,7 +3,6 @@ package com.agrilivestock.ecommerce.controller;
 import com.agrilivestock.ecommerce.dto.catalog.CategoryDto;
 import com.agrilivestock.ecommerce.dto.catalog.ProductDto;
 import com.agrilivestock.ecommerce.dto.catalog.ProductRequest;
-import com.agrilivestock.ecommerce.dto.content.BannerDto;
 import com.agrilivestock.ecommerce.dto.content.FAQDto;
 import com.agrilivestock.ecommerce.dto.content.HowItWorksDto;
 import com.agrilivestock.ecommerce.dto.content.WhyChooseUsDto;
@@ -17,7 +16,6 @@ import com.agrilivestock.ecommerce.repository.ReviewRepository;
 import com.agrilivestock.ecommerce.repository.UserRepository;
 import com.agrilivestock.ecommerce.response.ApiResponse;
 import com.agrilivestock.ecommerce.response.PageResponse;
-import com.agrilivestock.ecommerce.service.BannerService;
 import com.agrilivestock.ecommerce.service.CategoryService;
 import com.agrilivestock.ecommerce.service.FAQService;
 import com.agrilivestock.ecommerce.service.HowItWorksService;
@@ -67,7 +65,6 @@ public class AdminController {
     private final FAQService faqService;
     private final WhyChooseUsService whyChooseUsService;
     private final HowItWorksService howItWorksService;
-    private final BannerService bannerService;
     private final MediaService mediaService;
 
     private final UserRepository userRepository;
@@ -84,11 +81,48 @@ public class AdminController {
         long totalOrders = orderRepository.count();
         long pendingReviews = reviewRepository.findAll().stream().filter(r -> !r.isApproved()).count();
 
+        java.time.Instant now = java.time.Instant.now();
+        java.time.ZoneId zone = java.time.ZoneId.of("Asia/Kolkata");
+        
+        // Today
+        java.time.ZonedDateTime startOfDay = now.atZone(zone).truncatedTo(java.time.temporal.ChronoUnit.DAYS);
+        java.time.ZonedDateTime startOfTomorrow = startOfDay.plusDays(1);
+        
+        // This Week
+        java.time.ZonedDateTime startOfWeek = startOfDay.with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY));
+        
+        // This Month
+        java.time.ZonedDateTime startOfMonth = startOfDay.withDayOfMonth(1);
+        
+        java.math.BigDecimal dailySales = orderRepository.sumRevenueByDateRange(startOfDay.toInstant(), startOfTomorrow.toInstant());
+        java.math.BigDecimal weeklySales = orderRepository.sumRevenueByDateRange(startOfWeek.toInstant(), startOfTomorrow.toInstant());
+        java.math.BigDecimal monthlySales = orderRepository.sumRevenueByDateRange(startOfMonth.toInstant(), startOfTomorrow.toInstant());
+        java.math.BigDecimal totalSales = orderRepository.sumRevenue();
+
+        // Calculate sales trend for the last 7 months
+        java.util.List<Map<String, Object>> salesTrend = new java.util.ArrayList<>();
+        for (int i = 6; i >= 0; i--) {
+            java.time.ZonedDateTime monthStart = startOfMonth.minusMonths(i);
+            java.time.ZonedDateTime nextMonthStart = monthStart.plusMonths(1);
+            
+            java.math.BigDecimal rev = orderRepository.sumRevenueByDateRange(monthStart.toInstant(), nextMonthStart.toInstant());
+            
+            salesTrend.add(Map.of(
+                "month", monthStart.format(java.time.format.DateTimeFormatter.ofPattern("MMM")),
+                "revenue", rev
+            ));
+        }
+
         Map<String, Object> metrics = Map.of(
                 "totalUsers", totalUsers,
                 "totalProducts", totalProducts,
                 "totalOrders", totalOrders,
-                "pendingReviews", pendingReviews
+                "pendingReviews", pendingReviews,
+                "dailySales", dailySales,
+                "weeklySales", weeklySales,
+                "monthlySales", monthlySales,
+                "totalSales", totalSales,
+                "salesTrend", salesTrend
         );
 
         return ResponseEntity.ok(ApiResponse.success("Dashboard metrics loaded", metrics));
@@ -302,6 +336,15 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success("User status updated", updated));
     }
 
+    @PutMapping("/users/{id}")
+    @Operation(summary = "Update user details by admin")
+    public ResponseEntity<ApiResponse<UserResponse>> updateUserDetails(
+            @PathVariable Long id,
+            @RequestBody @Valid com.agrilivestock.ecommerce.dto.user.AdminUpdateUserRequest request) {
+        UserResponse response = userService.updateUserDetails(id, request);
+        return ResponseEntity.ok(ApiResponse.success("User details updated successfully", response));
+    }
+
     // --- Content CRUD (FAQ, Why Choose Us, How It Works, Banner) ---
     @PostMapping("/faqs")
     public ResponseEntity<ApiResponse<FAQDto>> createFaq(@Valid @RequestBody FAQDto dto) {
@@ -348,26 +391,15 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success("Item deleted"));
     }
 
-    @PostMapping(value = "/how-it-works", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<HowItWorksDto>> createHowItWorks(
-            @RequestPart("data") @Valid HowItWorksDto dto,
-            @RequestPart(value = "image", required = false) MultipartFile image) {
-        if (image != null && !image.isEmpty()) {
-            String url = mediaService.uploadFile(image, "content");
-            dto = new HowItWorksDto(dto.id(), dto.title(), dto.description(), url);
-        }
+    @PostMapping("/how-it-works")
+    public ResponseEntity<ApiResponse<HowItWorksDto>> createHowItWorks(@Valid @RequestBody HowItWorksDto dto) {
         return ResponseEntity.ok(ApiResponse.success("Item created", howItWorksService.create(dto)));
     }
 
-    @PutMapping(value = "/how-it-works/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping("/how-it-works/{id}")
     public ResponseEntity<ApiResponse<HowItWorksDto>> updateHowItWorks(
             @PathVariable Long id, 
-            @RequestPart("data") @Valid HowItWorksDto dto,
-            @RequestPart(value = "image", required = false) MultipartFile image) {
-        if (image != null && !image.isEmpty()) {
-            String url = mediaService.uploadFile(image, "content");
-            dto = new HowItWorksDto(dto.id(), dto.title(), dto.description(), url);
-        }
+            @Valid @RequestBody HowItWorksDto dto) {
         return ResponseEntity.ok(ApiResponse.success("Item updated", howItWorksService.update(id, dto)));
     }
 
@@ -375,34 +407,5 @@ public class AdminController {
     public ResponseEntity<ApiResponse<Void>> deleteHowItWorks(@PathVariable Long id) {
         howItWorksService.delete(id);
         return ResponseEntity.ok(ApiResponse.success("Item deleted"));
-    }
-
-    @PostMapping(value = "/banners", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<BannerDto>> createBanner(
-            @RequestPart("data") @Valid BannerDto dto,
-            @RequestPart(value = "image", required = false) MultipartFile image) {
-        if (image != null && !image.isEmpty()) {
-            String url = mediaService.uploadFile(image, "banners");
-            dto = new BannerDto(dto.id(), url, dto.title(), dto.subtitle(), dto.buttonText(), dto.buttonUrl());
-        }
-        return ResponseEntity.ok(ApiResponse.success("Banner created", bannerService.createBanner(dto)));
-    }
-
-    @PutMapping(value = "/banners/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<BannerDto>> updateBanner(
-            @PathVariable Long id, 
-            @RequestPart("data") @Valid BannerDto dto,
-            @RequestPart(value = "image", required = false) MultipartFile image) {
-        if (image != null && !image.isEmpty()) {
-            String url = mediaService.uploadFile(image, "banners");
-            dto = new BannerDto(dto.id(), url, dto.title(), dto.subtitle(), dto.buttonText(), dto.buttonUrl());
-        }
-        return ResponseEntity.ok(ApiResponse.success("Banner updated", bannerService.updateBanner(id, dto)));
-    }
-
-    @DeleteMapping("/banners/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteBanner(@PathVariable Long id) {
-        bannerService.deleteBanner(id);
-        return ResponseEntity.ok(ApiResponse.success("Banner deleted"));
     }
 }

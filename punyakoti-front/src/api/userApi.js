@@ -48,4 +48,9 @@ export const userApi = {
     });
     return response.data?.data || response.data;
   },
+
+  updateUserDetails: async (userId, payload) => {
+    const response = await axiosInstance.put(`/admin/users/${userId}`, payload);
+    return response.data?.data || response.data;
+  },
 };

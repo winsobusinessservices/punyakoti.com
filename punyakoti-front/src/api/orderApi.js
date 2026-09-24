@@ -50,4 +50,9 @@ export const orderApi = {
     );
     return response.data?.data || response.data;
   },
+
+  checkPurchase: async (productId) => {
+    const response = await axiosInstance.get(`/orders/check-purchase?productId=${productId}`);
+    return response.data?.data ?? response.data;
+  }
 };

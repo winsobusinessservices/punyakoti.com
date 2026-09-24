@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,8 +40,9 @@ public class LocalMediaServiceImpl implements MediaService {
 
             String filename = UUID.randomUUID() + extension;
             Path uploadDir = Paths.get(basePath, folder);
-            if (!Files.exists(uploadDir)) {
-                Files.createDirectories(uploadDir);
+            File dir = uploadDir.toFile();
+            if (!dir.exists()) {
+                dir.mkdirs();
             }
 
             Path destination = uploadDir.resolve(filename);

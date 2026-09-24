@@ -29,18 +29,18 @@ const AboutUs = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative bg-gray-900 text-white overflow-hidden py-24 sm:py-32">
+      <section className="relative bg-gray-900 text-white overflow-hidden py-16 sm:py-24 md:py-32">
         <div className="absolute inset-0 overflow-hidden">
           {/* A subtle background gradient or texture could go here */}
           <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary/20 rounded-full blur-3xl opacity-50"></div>
           <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-black to-transparent"></div>
         </div>
         
-        <div className="relative max-w-7xl mx-auto px-5 lg:px-8 z-10 text-center">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-5 lg:px-8 z-10 text-center">
           <span className="text-primary font-bold tracking-widest uppercase text-xs sm:text-sm mb-4 block">
             Our Story
           </span>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold mb-6 leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-extrabold mb-4 sm:mb-6 leading-tight">
             Empowering Farmers, <br className="hidden sm:block" />
             Protecting Livestock
           </h1>
@@ -51,8 +51,8 @@ const AboutUs = () => {
       </section>
 
       {/* Main Content */}
-      <section className="max-w-7xl mx-auto px-5 lg:px-8 py-16 sm:py-24">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <section className="max-w-7xl mx-auto px-4 sm:px-5 lg:px-8 py-12 sm:py-16 md:py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-16 items-center">
           <div className="space-y-6">
             <h2 className="text-3xl sm:text-4xl font-display font-bold text-stone-850">
               Your Partner in Agriculture
@@ -84,7 +84,7 @@ const AboutUs = () => {
 
       {/* Core Values */}
       <section className="bg-stone-50 py-16 sm:py-24">
-        <div className="max-w-7xl mx-auto px-5 lg:px-8 text-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-5 lg:px-8 text-center">
           <span className="text-primary font-bold tracking-widest uppercase text-xs mb-3 block">
             Why Choose Us
           </span>
@@ -94,7 +94,7 @@ const AboutUs = () => {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {values.map((val, idx) => (
-              <div key={idx} className="bg-white p-8 rounded-2xl shadow-sm border border-stone-100 hover:shadow-md transition-shadow">
+              <div key={idx} className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-stone-100 hover:shadow-md transition-shadow">
                 <div className="w-14 h-14 rounded-full bg-stone-50 flex items-center justify-center mb-6 mx-auto">
                   {val.icon}
                 </div>
@@ -109,7 +109,7 @@ const AboutUs = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 sm:py-32 max-w-5xl mx-auto px-5 text-center">
+      <section className="py-14 sm:py-20 md:py-32 max-w-5xl mx-auto px-4 sm:px-5 text-center">
         <h2 className="text-3xl sm:text-5xl font-display font-bold text-stone-850 mb-6">
           Elevate Your Farm's Productivity
         </h2>

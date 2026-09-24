@@ -17,7 +17,7 @@ const AdminReviews = () => {
 
   const { data: products = [] } = useQuery({
     queryKey: ["products"],
-    queryFn: productApi.getProducts,
+    queryFn: () => productApi.getProducts({}),
   });
 
   const [selectedProductId, setSelectedProductId] = useState("");

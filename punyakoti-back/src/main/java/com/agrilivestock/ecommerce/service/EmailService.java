@@ -46,6 +46,19 @@ public class EmailService {
         sendHtmlEmail(toEmail, subject, content);
     }
 
+    public void sendContactQueryEmailToAdmin(String name, String email, String phone, String subjectLine, String message) {
+        String subject = "New Contact Query: " + subjectLine;
+        
+        String content = "<h1>New Contact Submission</h1>"
+                + "<p><strong>Name:</strong> " + name + "</p>"
+                + "<p><strong>Email:</strong> " + email + "</p>"
+                + "<p><strong>Phone:</strong> " + phone + "</p>"
+                + "<p><strong>Message:</strong><br/>" + message.replace("\n", "<br/>") + "</p>";
+
+        // Send to the 'fromEmail' itself as the admin email, or a dedicated admin email
+        sendHtmlEmail(fromEmail, subject, content);
+    }
+
     private void sendHtmlEmail(String to, String subject, String htmlContent) {
         try {
             MimeMessage message = mailSender.createMimeMessage();

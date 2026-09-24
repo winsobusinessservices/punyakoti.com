@@ -72,14 +72,16 @@ public class OrderServiceImpl implements OrderService {
                 .user(currentUser)
                 .status(OrderStatus.PENDING)
                 .total(total)
-                .shipFullName(address.getFullName())
-                .shipPhone(address.getPhoneNumber())
+                .shipFullName(currentUser.getName())
+                .shipPhone(currentUser.getMobileNumber() != null ? currentUser.getMobileNumber().toString() : "")
                 .shipLine1(address.getLine1())
                 .shipLine2(address.getLine2())
                 .shipCity(address.getCity())
                 .shipState(address.getState())
                 .shipPostalCode(address.getPostalCode())
                 .shipCountry(address.getCountry())
+                .paymentMethod(request.paymentMethod() != null ? request.paymentMethod() : "ONLINE")
+                .paymentStatus("COD".equalsIgnoreCase(request.paymentMethod()) ? "COD" : "PENDING")
                 .build();
 
         List<OrderItem> orderItems = cart.getItems().stream().map(cartItem -> OrderItem.builder()
@@ -97,12 +99,31 @@ public class OrderServiceImpl implements OrderService {
 
         Order saved = orderRepository.save(order);
 
-        try {
-            String razorpayOrderId = paymentService.createRazorpayOrder(saved);
-            saved.setRazorpayOrderId(razorpayOrderId);
-            saved = orderRepository.save(saved);
-        } catch (Exception e) {
-            throw new BadRequestException("Failed to initialize payment gateway: " + e.getMessage());
+        if (!"COD".equalsIgnoreCase(request.paymentMethod())) {
+            try {
+                String razorpayOrderId = paymentService.createRazorpayOrder(saved);
+                saved.setRazorpayOrderId(razorpayOrderId);
+                saved = orderRepository.save(saved);
+            } catch (Exception e) {
+                throw new BadRequestException("Failed to initialize payment gateway: " + e.getMessage());
+            }
+        } else {
+             // For COD, order is confirmed immediately
+             saved.setStatus(OrderStatus.CONFIRMED);
+             saved = orderRepository.save(saved);
+             
+             // Send confirmation email
+             emailService.sendOrderConfirmation(
+                     saved.getUser().getEmail(),
+                     saved.getUser().getName(),
+                     saved.getOrderNumber(),
+                     saved.getTotal().toString()
+             );
+             
+             // Clear the cart
+             cartItemRepository.deleteAll(cart.getItems());
+             cart.getItems().clear();
+             cartRepository.save(cart);
         }
 
         return orderMapper.toResponse(saved);
@@ -194,5 +215,10 @@ public class OrderServiceImpl implements OrderService {
         }
 
         return orderMapper.toResponse(orderRepository.save(order));
+    }
+
+    @Override
+    public boolean hasUserPurchasedProduct(User currentUser, Long productId) {
+        return orderRepository.hasUserPurchasedProduct(currentUser.getId(), productId);
     }
 }

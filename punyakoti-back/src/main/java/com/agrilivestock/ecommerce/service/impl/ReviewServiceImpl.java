@@ -26,6 +26,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final ProductRepository productRepository;
+    private final com.agrilivestock.ecommerce.repository.OrderRepository orderRepository;
     private final ReviewMapper reviewMapper;
 
     @Override
@@ -33,6 +34,14 @@ public class ReviewServiceImpl implements ReviewService {
     public ReviewResponse createReview(User currentUser, ReviewRequest request) {
         Product product = productRepository.findById(request.productId())
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+        if (!orderRepository.hasUserPurchasedProduct(currentUser.getId(), product.getId())) {
+            throw new IllegalArgumentException("You can only review products that have been delivered to you.");
+        }
+
+        if (reviewRepository.existsByUserIdAndProductId(currentUser.getId(), product.getId())) {
+            throw new IllegalArgumentException("You have already submitted a review for this product.");
+        }
 
         Review review = Review.builder()
                 .product(product)

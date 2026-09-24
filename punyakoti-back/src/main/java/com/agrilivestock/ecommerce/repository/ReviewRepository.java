@@ -29,4 +29,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Page<Review> findByApprovedTrue(Pageable pageable);
 
     long countByApprovedFalse();
+
+    boolean existsByUserIdAndProductId(Long userId, Long productId);
 }

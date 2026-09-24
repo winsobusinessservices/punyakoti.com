@@ -61,6 +61,7 @@ const Checkout = () => {
   });
 
   const [paymentMethod, setPaymentMethod] = useState("ONLINE");
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handlePlaceOrder = async () => {
     if (!selectedAddressId) {
@@ -68,8 +69,12 @@ const Checkout = () => {
       return;
     }
 
+    setIsProcessing(true);
     try {
-      const paymentOrder = await paymentApi.createOrder(selectedAddressId, paymentMethod);
+      const paymentOrder = await paymentApi.createOrder(
+        selectedAddressId,
+        paymentMethod,
+      );
 
       if (paymentMethod === "COD") {
         clearCart();
@@ -84,6 +89,7 @@ const Checkout = () => {
 
       if (!res) {
         toast.error("Razorpay SDK failed to load. Are you online?");
+        setIsProcessing(false);
         return;
       }
 
@@ -107,7 +113,13 @@ const Checkout = () => {
             navigate(`/order-success?orderId=${paymentOrder.id}`);
           } catch (verifyError) {
             toast.error("Payment verification failed.");
+            setIsProcessing(false);
           }
+        },
+        modal: {
+          ondismiss: function () {
+            setIsProcessing(false);
+          },
         },
         prefill: {
           name: user?.name,
@@ -123,6 +135,7 @@ const Checkout = () => {
       paymentObject.open();
     } catch (error) {
       toast.error("Failed to initiate payment or place order.");
+      setIsProcessing(false);
     }
   };
 
@@ -136,12 +149,12 @@ const Checkout = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 text-left">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8 text-left">
       <Breadcrumb
         items={[{ label: "Cart", path: "/cart" }, { label: "Checkout" }]}
       />
 
-      <h1 className="font-display font-extrabold text-3xl text-stone-850 m-0 pb-2 border-b border-stone-200">
+      <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-stone-850 m-0 pb-2 border-b border-stone-200">
         Checkout
       </h1>
 
@@ -282,40 +295,52 @@ const Checkout = () => {
               </div>
             )}
           </div>
-          
+
           {/* Payment Method Selection */}
           <div className="bg-white border border-stone-200/80 rounded-3xl p-6 shadow-sm space-y-4">
             <h3 className="font-display font-bold text-stone-850 text-xl border-b border-stone-100 pb-3">
               Payment Method
             </h3>
             <div className="space-y-3">
-              <label className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all ${paymentMethod === 'ONLINE' ? 'border-primary bg-primary/5' : 'border-stone-200 hover:border-primary/30'}`}>
-                <input 
-                  type="radio" 
-                  name="paymentMethod" 
-                  value="ONLINE" 
-                  checked={paymentMethod === 'ONLINE'} 
-                  onChange={() => setPaymentMethod('ONLINE')}
+              <label
+                className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all ${paymentMethod === "ONLINE" ? "border-primary bg-primary/5" : "border-stone-200 hover:border-primary/30"}`}
+              >
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="ONLINE"
+                  checked={paymentMethod === "ONLINE"}
+                  onChange={() => setPaymentMethod("ONLINE")}
                   className="w-4 h-4 text-primary focus:ring-primary border-stone-300"
                 />
                 <div>
-                  <span className="block font-semibold text-stone-800 text-sm">Pay Online</span>
-                  <span className="block text-xs text-stone-500 mt-0.5">UPI, Cards, NetBanking (via Razorpay)</span>
+                  <span className="block font-semibold text-stone-800 text-sm">
+                    Pay Online
+                  </span>
+                  <span className="block text-xs text-stone-500 mt-0.5">
+                    UPI, Cards, NetBanking (via Razorpay)
+                  </span>
                 </div>
               </label>
-              
-              <label className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all ${paymentMethod === 'COD' ? 'border-primary bg-primary/5' : 'border-stone-200 hover:border-primary/30'}`}>
-                <input 
-                  type="radio" 
-                  name="paymentMethod" 
-                  value="COD" 
-                  checked={paymentMethod === 'COD'} 
-                  onChange={() => setPaymentMethod('COD')}
+
+              <label
+                className={`flex items-center gap-3 p-4 border rounded-xl cursor-pointer transition-all ${paymentMethod === "COD" ? "border-primary bg-primary/5" : "border-stone-200 hover:border-primary/30"}`}
+              >
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="COD"
+                  checked={paymentMethod === "COD"}
+                  onChange={() => setPaymentMethod("COD")}
                   className="w-4 h-4 text-primary focus:ring-primary border-stone-300"
                 />
                 <div>
-                  <span className="block font-semibold text-stone-800 text-sm">Cash on Delivery</span>
-                  <span className="block text-xs text-stone-500 mt-0.5">Pay at your doorstep</span>
+                  <span className="block font-semibold text-stone-800 text-sm">
+                    Cash on Delivery
+                  </span>
+                  <span className="block text-xs text-stone-500 mt-0.5">
+                    Pay at your doorstep
+                  </span>
                 </div>
               </label>
             </div>
@@ -371,10 +396,19 @@ const Checkout = () => {
 
           <button
             onClick={handlePlaceOrder}
-            disabled={!selectedAddressId}
+            disabled={!selectedAddressId || isProcessing}
             className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary-light text-white font-bold py-3.5 rounded-xl shadow-lg transition-all active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Pay Now
+            {isProcessing ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                Processing...
+              </>
+            ) : paymentMethod === "COD" ? (
+              "Place Order"
+            ) : (
+              "Pay Now"
+            )}
           </button>
         </div>
       </div>

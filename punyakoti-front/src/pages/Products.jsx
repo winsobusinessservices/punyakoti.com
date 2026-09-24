@@ -17,8 +17,8 @@ const Products = () => {
   const searchQuery = searchParams.get("search") || "";
 
   const { data: products = [], isLoading: loading } = useQuery({
-    queryKey: ["products"],
-    queryFn: productApi.getProducts,
+    queryKey: ["products", activeCategory, searchQuery],
+    queryFn: () => productApi.getProducts({ categoryId: activeCategory, search: searchQuery }),
   });
 
   const { data: categories = [] } = useQuery({
@@ -48,26 +48,15 @@ const Products = () => {
     });
   };
 
-  // Filter products based on search and category
-  const filteredProducts = products.filter((prod) => {
-    const matchesCategory = activeCategory
-      ? String(prod.category?.id) === activeCategory
-      : true;
-    const matchesSearch =
-      prod.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (prod.description || "")
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const filteredProducts = products;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 text-left">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8 text-left">
       <Breadcrumb items={[{ label: t("products") }]} />
 
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 pb-6 border-b border-stone-200">
         <div className="space-y-1">
-          <h1 className="font-display font-extrabold text-3xl text-stone-850 m-0">
+          <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-stone-850 m-0">
             {t("allProducts")}
           </h1>
           <p className="text-xs md:text-sm text-stone-500">
@@ -87,10 +76,10 @@ const Products = () => {
       </div>
 
       {/* Category Tabs */}
-      <div className="flex flex-wrap gap-2.5">
+      <div className="flex gap-2 sm:gap-2.5 overflow-x-auto hide-scrollbar pb-2">
         <button
           onClick={() => handleCategoryChange("")}
-          className={`px-5 py-2.5 rounded-xl font-semibold text-xs transition-all shadow-xs ${
+          className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold text-xs transition-all shadow-xs whitespace-nowrap shrink-0 ${
             activeCategory === ""
               ? "bg-primary text-white"
               : "bg-white border border-stone-200 text-stone-600 hover:bg-stone-50"
@@ -102,7 +91,7 @@ const Products = () => {
           <button
             key={cat.id}
             onClick={() => handleCategoryChange(String(cat.id))}
-            className={`px-5 py-2.5 rounded-xl font-semibold text-xs transition-all shadow-xs ${
+            className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold text-xs transition-all shadow-xs whitespace-nowrap shrink-0 ${
               activeCategory === String(cat.id)
                 ? "bg-primary text-white"
                 : "bg-white border border-stone-200 text-stone-600 hover:bg-stone-50"
@@ -117,7 +106,7 @@ const Products = () => {
       {loading ? (
         <Loader type="skeleton-card" count={3} />
       ) : filteredProducts.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
           {filteredProducts.map((prod) => (
             <ProductCard key={prod.id} product={prod} />
           ))}
@@ -128,7 +117,7 @@ const Products = () => {
           message="Try adjusting filters, or clearing the search query to see catalog products."
           actionText="Clear Filters"
           onAction={() => {
-            setSearchQuery("");
+            handleSearchChange("");
             handleCategoryChange("");
           }}
         />

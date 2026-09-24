@@ -3,7 +3,12 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
-import { FiChevronLeft, FiChevronRight, FiMessageCircle, FiPhone } from "react-icons/fi";
+import {
+  FiChevronLeft,
+  FiChevronRight,
+  FiMessageCircle,
+  FiPhone,
+} from "react-icons/fi";
 import { useQuery } from "@tanstack/react-query";
 
 // Import CSS for Swiper
@@ -35,7 +40,7 @@ const Home = () => {
 
   const { data: prods = [], isLoading: isLoadingProds } = useQuery({
     queryKey: ["products"],
-    queryFn: productApi.getProducts,
+    queryFn: () => productApi.getProducts({}),
   });
 
   const { data: revs = [], isLoading: isLoadingRevs } = useQuery({
@@ -76,16 +81,16 @@ const Home = () => {
   // Stacked Category slider index removed as it is replaced by Swiper
 
   return (
-    <div className="space-y-10 md:space-y-16 pb-20 overflow-x-hidden">
+    <div className="space-y-8 sm:space-y-10 md:space-y-16 pb-12 sm:pb-20 overflow-x-hidden">
       {/* Hero Banner */}
       <div className="w-full">
         <Hero />
       </div>
 
       {/* Categories Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gray-50 rounded-3xl p-6 sm:py-6 sm:px-8 border border-stone-200/60 overflow-hidden">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="bg-gray-50 rounded-2xl sm:rounded-3xl p-4 sm:p-6 sm:py-6 sm:px-8 border border-stone-200/60 overflow-hidden">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:mb-8">
             <div className="space-y-1">
               <span className="text-[11px] md:text-xs font-extrabold tracking-widest text-gray-500 uppercase">
                 Shop By Category
@@ -127,14 +132,14 @@ const Home = () => {
               disableOnInteraction: false,
             }}
             spaceBetween={16}
-            slidesPerView={2}
+            slidesPerView={3}
             breakpoints={{
               500: { slidesPerView: 3, spaceBetween: 16 },
               768: { slidesPerView: 4, spaceBetween: 20 },
               1024: { slidesPerView: 5, spaceBetween: 24 },
               1280: { slidesPerView: 7, spaceBetween: 20 },
             }}
-            className="w-full pb-2"
+            className="w-full md:pb-2"
           >
             {categoriesList.map((cat, idx) => {
               // Creating a soft background color sequence based on index (Grays and Blues)
@@ -201,7 +206,7 @@ const Home = () => {
       </section>
 
       {/* Featured Products */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 md:space-y-8">
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-4 sm:space-y-6 md:space-y-8">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="text-left space-y-1">
             <h2 className="text-2xl md:text-3xl font-display font-extrabold text-stone-850">
@@ -213,7 +218,7 @@ const Home = () => {
           </div>
           <Link
             to="/products"
-            className="text-xs md:text-sm font-bold max-md:self-end text-primary hover:text-primary-light flex items-center gap-1.5 transition-all"
+            className="text-xs md:text-sm font-bold text-primary hover:text-primary-light flex items-center gap-1.5 transition-all"
           >
             <span>View All Products</span>
             <span className="text-lg">→</span>
@@ -225,49 +230,60 @@ const Home = () => {
             <Loader type="skeleton-card" count={3} />
           </div>
         ) : (
-          <div className="flex overflow-x-auto lg:grid lg:grid-cols-4 gap-4 lg:gap-8 hide-scrollbar snap-x snap-mandatory pb-4">
-            {featuredProducts.map((prod) => (
-              <div key={prod.id} className="min-w-[75vw] sm:min-w-[45vw] lg:min-w-0 snap-start shrink-0">
-                <ProductCard product={prod} />
-              </div>
-            ))}
+          <div className="pb-4">
+            <Swiper
+              modules={[Autoplay]}
+              spaceBetween={16}
+              slidesPerView={2.2}
+              autoplay={{ delay: 4000, disableOnInteraction: false }}
+              breakpoints={{
+                640: { slidesPerView: 3, spaceBetween: 16 },
+                1024: { slidesPerView: 4, spaceBetween: 24 },
+              }}
+              className="w-full"
+            >
+              {featuredProducts.map((prod) => (
+                <SwiperSlide key={prod.id}>
+                  <ProductCard product={prod} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
           </div>
         )}
       </section>
 
       {/* Why Choose Us Section (Vibrant colorful cards) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="py-12 lg:py-16 px-6 sm:px-8 md:px-12 bg-white rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col gap-12 lg:gap-16 items-center lg:items-start">
-        {/* Left Side: Title */}
-        <div className="lg:w-1/4 shrink-0 space-y-5 text-center lg:text-left">
-          <div className="space-y-3 flex flex-col items-center lg:items-start">
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest">
-              Minimal
-            </span>
-            <div className="w-8 h-0.5 bg-gray-300"></div>
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="py-8 sm:py-12 lg:py-16 px-4 sm:px-8 md:px-12 bg-white rounded-2xl sm:rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col gap-8 sm:gap-12 lg:gap-16 items-center lg:items-start">
+          {/* Left Side: Title */}
+          <div className="lg:w-1/4 shrink-0 space-y-5 text-center lg:text-left">
+            <div className="space-y-3 flex flex-col items-center lg:items-start"></div>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-extrabold text-gray-900 leading-[1.1]">
+              Why
+              <br className="hidden lg:block" /> choose us
+            </h2>
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-extrabold text-gray-900 leading-[1.1]">
-            Why<br className="hidden lg:block" /> choose us
-          </h2>
-        </div>
 
-        {/* Right Side: Grid of items */}
-        <div className="w-full grid grid-cols-2 md:grid-cols-5 gap-x-6 gap-y-12">
-          {wcuList.map((wcu, index) => (
-            <WhyChooseCard
-              key={wcu.id}
-              icon={wcu.icon}
-              title={wcu.title}
-              description={wcu.description}
-              index={index}
-            />
-          ))}
-        </div>
+          {/* Right Side: Grid of items */}
+          <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-4 sm:gap-x-6 gap-y-8 sm:gap-y-12">
+            {wcuList.map((wcu, index) => (
+              <WhyChooseCard
+                key={wcu.id}
+                icon={wcu.icon}
+                title={wcu.title}
+                description={wcu.description}
+                index={index}
+              />
+            ))}
+          </div>
         </div>
       </section>
 
       {/* How It Works (Bilona Churning Video) */}
-      <section id="how-it-works" className="bg-white py-12 lg:py-20 border-y border-gray-100">
+      <section
+        id="how-it-works"
+        className="bg-white py-12 lg:py-20 border-y border-gray-100"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {hiwList.length > 0 ? (
             <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 items-start">
@@ -283,7 +299,9 @@ const Home = () => {
                   </div>
                   <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-medium text-gray-900 leading-tight">
                     Traditional processes <br className="hidden md:block" />
-                    <span className="text-gray-400">for pure natural quality.</span>
+                    <span className="text-gray-400">
+                      for pure natural quality.
+                    </span>
                   </h2>
                 </div>
 
@@ -307,16 +325,22 @@ const Home = () => {
                     <div key={index} className="relative pl-10 group">
                       <div className="absolute -left-4 top-0 bg-amber-50 border border-amber-100 shadow-sm rounded-lg flex items-center justify-center w-8 h-8 text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-300">
                         {/* Step number icon */}
-                        <span className="text-xs font-bold font-display">{index + 1}</span>
+                        <span className="text-xs font-bold font-display">
+                          {index + 1}
+                        </span>
                       </div>
                       <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">
                         Step {index + 1}
                       </span>
                       <h3 className="text-sm md:text-base font-semibold text-gray-900 mb-1.5">
-                        {index === 0 && hiwList[0] ? hiwList[0].title || step.title : step.title}
+                        {index === 0 && hiwList[0]
+                          ? hiwList[0].title || step.title
+                          : step.title}
                       </h3>
                       <p className="text-xs md:text-sm text-gray-500 leading-relaxed max-w-sm">
-                        {index === 0 && hiwList[0] ? hiwList[0].description || step.desc : step.desc}
+                        {index === 0 && hiwList[0]
+                          ? hiwList[0].description || step.desc
+                          : step.desc}
                       </p>
                     </div>
                   ))}
@@ -326,20 +350,19 @@ const Home = () => {
               {/* Right Side: Description & Video */}
               <div className="lg:w-1/2 w-full lg:mt-6 flex flex-col gap-10">
                 <p className="text-sm md:text-base text-gray-500 leading-relaxed lg:pl-12 border-l-0 lg:border-l border-gray-100">
-                  Describe exactly what you need, let our traditional processes intelligently create the best cattle products, then review and experience them in just a few clicks.
+                  Describe exactly what you need, let our traditional processes
+                  intelligently create the best cattle products, then review and
+                  experience them in just a few clicks.
                 </p>
 
                 <div className="bg-white p-2.5 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 relative overflow-hidden">
-                   <div className="absolute inset-0 bg-gradient-to-tr from-gray-50 to-white -z-10"></div>
-                   <div className="rounded-2xl overflow-hidden relative shadow-inner bg-stone-100 aspect-video">
-                      <VideoPlayer
-                        url={
-                          hiwList[0]?.videoUrl ||
-                          "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
-                        }
-                        poster="https://images.unsplash.com/photo-1596733430284-f7437764b1a9?auto=format&fit=crop&q=80&w=800"
-                      />
-                   </div>
+                  <div className="absolute inset-0 bg-gradient-to-tr from-gray-50 to-white -z-10"></div>
+                  <div className="rounded-2xl overflow-hidden relative shadow-inner bg-stone-100 aspect-video">
+                    <VideoPlayer
+                      url={hiwList[0]?.videoUrl}
+                      controls={true}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -352,7 +375,7 @@ const Home = () => {
       </section>
 
       {/* Customer Reviews Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 md:space-y-8">
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-4 sm:space-y-6 md:space-y-8">
         <div className="text-center space-y-2">
           <h2 className="text-2xl md:text-3xl font-display font-extrabold text-stone-850">
             {t("reviewsTitle")}
@@ -361,7 +384,6 @@ const Home = () => {
             Read pure testimonies from verified buyers.
           </p>
         </div>
-
         {loading ? (
           <Loader />
         ) : (
@@ -415,7 +437,7 @@ const Home = () => {
       </section>
 
       {/* FAQs Section (Left Side Support Helpline Card + Right Side Accordion FAQ) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         {loading ? (
           <Loader />
         ) : (
@@ -442,7 +464,8 @@ const Home = () => {
                   </h3>
                 </div>
                 <p className="text-sm text-gray-500 leading-relaxed mb-6">
-                  Our team will answer all your questions. we ensure a quick response.
+                  Our team will answer all your questions. we ensure a quick
+                  response.
                 </p>
                 <Link
                   to="/contact"
@@ -457,11 +480,11 @@ const Home = () => {
             {/* Right Side: Accordion FAQs */}
             <div className="lg:w-2/3 w-full flex flex-col pt-2">
               {faqList.map((faq, index) => (
-                <div key={faq.id} className={index === 0 ? "border-t border-gray-200" : ""}>
-                  <FAQAccordion
-                    question={faq.question}
-                    answer={faq.answer}
-                  />
+                <div
+                  key={faq.id}
+                  className={index === 0 ? "border-t border-gray-200" : ""}
+                >
+                  <FAQAccordion question={faq.question} answer={faq.answer} />
                 </div>
               ))}
             </div>

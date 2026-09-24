@@ -49,12 +49,12 @@ const Cart = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 text-left relative">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8 text-left relative">
       {cartLoading && <Loader type="full" />}
 
       <Breadcrumb items={[{ label: t("cart") }]} />
 
-      <h1 className="font-display font-extrabold text-3xl text-stone-850 m-0 pb-2 border-b border-stone-200">
+      <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-stone-850 m-0 pb-2 border-b border-stone-200">
         Shopping Cart
       </h1>
 
@@ -64,7 +64,7 @@ const Cart = () => {
           {cartItems.map((item) => (
             <div
               key={`${item.productId}-${item.weight}`}
-              className="bg-white border border-stone-200/80 rounded-2xl p-4 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 shadow-xs relative"
+              className="bg-white border border-stone-200/80 rounded-2xl p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6 shadow-xs relative"
             >
               {/* Product Thumbnail */}
               <div className="w-20 h-20 bg-stone-50 rounded-xl overflow-hidden shrink-0 border border-stone-200">
@@ -96,7 +96,7 @@ const Cart = () => {
               </div>
 
               {/* Adjust Quantity and Subtotal */}
-              <div className="flex items-center gap-5 sm:gap-6 shrink-0">
+              <div className="flex items-center gap-3 sm:gap-5 md:gap-6 shrink-0 w-full sm:w-auto justify-between sm:justify-end">
                 <QuantitySelector
                   value={item.quantity}
                   onChange={(q) =>

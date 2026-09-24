@@ -36,4 +36,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("select coalesce(sum(o.total), 0) from Order o where o.status <> com.agrilivestock.ecommerce.enums.OrderStatus.CANCELLED")
     BigDecimal sumRevenue();
+
+    @Query("select coalesce(sum(o.total), 0) from Order o where o.status <> com.agrilivestock.ecommerce.enums.OrderStatus.CANCELLED and o.createdAt >= :startDate and o.createdAt < :endDate")
+    BigDecimal sumRevenueByDateRange(java.time.Instant startDate, java.time.Instant endDate);
+
+    @Query("SELECT CASE WHEN COUNT(o) > 0 THEN true ELSE false END FROM Order o JOIN o.items i WHERE o.user.id = :userId AND i.variant.product.id = :productId AND o.status = com.agrilivestock.ecommerce.enums.OrderStatus.DELIVERED")
+    boolean hasUserPurchasedProduct(Long userId, Long productId);
 }

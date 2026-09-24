@@ -70,24 +70,24 @@ const Blogs = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Blog Header */}
-      <section className="bg-gray-900 text-white py-20 text-center relative overflow-hidden">
+      <section className="bg-gray-900 text-white py-14 sm:py-20 text-center relative overflow-hidden">
         {/* Subtle blur circles */}
         <div className="absolute top-0 right-1/4 w-64 h-64 bg-primary/20 rounded-full blur-3xl"></div>
         <div className="absolute bottom-0 left-1/4 w-48 h-48 bg-gray-700/50 rounded-full blur-3xl"></div>
         
         <div className="relative z-10 px-5 max-w-3xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-display font-extrabold mb-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-display font-extrabold mb-3 sm:mb-4">
             Punyakoti Journal
           </h1>
-          <p className="text-stone-300 text-lg">
+          <p className="text-stone-300 text-sm sm:text-lg">
             Insights on livestock health, farm management, and agricultural supplies.
           </p>
         </div>
       </section>
 
       {/* Featured / Latest Post (optional hero block) */}
-      <section className="max-w-7xl mx-auto px-5 lg:px-8 mt-12 mb-16">
-        <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-stone-200/60 flex flex-col lg:flex-row group cursor-pointer hover:shadow-md transition-shadow">
+      <section className="max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 mt-8 sm:mt-12 mb-10 sm:mb-16">
+        <div className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border border-stone-200/60 flex flex-col lg:flex-row group cursor-pointer hover:shadow-md transition-shadow">
           <div className="lg:w-1/2 h-64 lg:h-auto overflow-hidden">
             <img 
               src={mockBlogs[0].image} 
@@ -95,7 +95,7 @@ const Blogs = () => {
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
           </div>
-          <div className="lg:w-1/2 p-8 lg:p-12 flex flex-col justify-center">
+          <div className="lg:w-1/2 p-5 sm:p-8 lg:p-12 flex flex-col justify-center">
             <div className="flex items-center gap-3 mb-4">
               <span className="bg-blue-50 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
                 {mockBlogs[0].category}
@@ -124,14 +124,14 @@ const Blogs = () => {
       </section>
 
       {/* Blog Grid */}
-      <section className="max-w-7xl mx-auto px-5 lg:px-8 pb-24">
+      <section className="max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 pb-16 sm:pb-24">
         <h3 className="text-2xl font-display font-bold text-stone-850 mb-8">Latest Articles</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {mockBlogs.slice(1).map((blog) => (
             <article key={blog.id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-stone-100 hover:shadow-lg transition-all group flex flex-col cursor-pointer">
               {/* Image */}
-              <div className="h-56 overflow-hidden relative">
+              <div className="h-40 sm:h-56 overflow-hidden relative">
                 <img 
                   src={blog.image} 
                   alt={blog.title}
@@ -145,7 +145,7 @@ const Blogs = () => {
               </div>
               
               {/* Content */}
-              <div className="p-6 flex flex-col flex-grow">
+              <div className="p-4 sm:p-6 flex flex-col flex-grow">
                 <div className="flex items-center gap-2 text-stone-400 text-xs font-semibold mb-3">
                   <span>{blog.date}</span>
                   <span>•</span>
@@ -155,7 +155,7 @@ const Blogs = () => {
                   </span>
                 </div>
                 
-                <h4 className="text-xl font-display font-bold text-stone-800 mb-3 group-hover:text-primary transition-colors line-clamp-2">
+                <h4 className="text-base sm:text-xl font-display font-bold text-stone-800 mb-2 sm:mb-3 group-hover:text-primary transition-colors line-clamp-2">
                   {blog.title}
                 </h4>
                 

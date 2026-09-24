@@ -217,7 +217,7 @@ const AdminLayout = () => {
         </header>
 
         {/* Content Body */}
-        <main className="flex-grow p-6 md:p-8 overflow-y-auto">
+        <main className="flex-grow p-3 sm:p-6 md:p-8 overflow-y-auto">
           <Outlet />
         </main>
       </div>

@@ -66,14 +66,14 @@ const ReviewCard = ({ review, index = 0 }) => {
         {/* Video review (embedded inline if video is present) */}
         {review.videoUrl && (
           <div className="mb-5 relative w-full overflow-hidden swiper-no-swiping">
-            <VideoPlayer
-              url={review.videoUrl}
-              className="rounded-2xl border-0 shadow-xs"
+            <video
+              src={review.videoUrl}
               controls={true}
               autoPlay={false}
               muted={false}
               loop={false}
-            />
+              className="aspect-video rounded-2xl border-0 shadow-xs"
+            ></video>
           </div>
         )}
 

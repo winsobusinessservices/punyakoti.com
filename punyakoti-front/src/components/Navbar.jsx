@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useCart } from "../hooks/useCart";
 import { useTranslation } from "react-i18next";
@@ -18,6 +18,20 @@ import { GiCaptainHatProfile, GiRamProfile } from "react-icons/gi";
 const Navbar = () => {
   const { isAuthenticated, role, logout } = useAuth();
   const { cartTotalCount } = useCart();
+  const [searchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
+
+  // Update search query state if URL changes
+  React.useEffect(() => {
+    setSearchQuery(searchParams.get("search") || "");
+  }, [searchParams]);
+
+  const handleSearch = (e) => {
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      setMobileOpen(false);
+      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -41,7 +55,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="bg-white/95 backdrop-blur-md border-b border-stone-200 sticky top-0 z-30 shadow-xs rounded-xl mx-5 mt-3">
+      <nav className="bg-white/95 backdrop-blur-md border-b border-stone-200 sticky top-0 z-30 shadow-xs rounded-xl mx-2 sm:mx-5 mt-2 sm:mt-3">
         <div className="px-4 sm:px-6 lg:px-16">
           <div className="flex justify-between h-16 items-center">
             {/* Logo */}
@@ -87,12 +101,10 @@ const Navbar = () => {
                 <input
                   type="text"
                   placeholder={t("search")}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && e.target.value.trim()) {
-                      navigate(`/products?search=${encodeURIComponent(e.target.value.trim())}`);
-                    }
-                  }}
-                  className="pl-10 pr-4 py-1 w-52 rounded-xl bg-white border border-stone-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={handleSearch}
+                  className="pl-10 pr-4 py-1 w-52 rounded-xl bg-white border border-stone-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-sm"
                 />
               </div>
             </div>
@@ -156,7 +168,28 @@ const Navbar = () => {
             </div>
 
             {/* Mobile hamburger */}
-            <div className="md:hidden flex items-center gap-2">
+            <div className="md:hidden flex items-center gap-1.5 sm:gap-2">
+              {isAuthenticated && (
+                <Link
+                  to="/cart"
+                  className="relative p-2 text-stone-600 hover:text-primary transition-colors"
+                >
+                  <FiShoppingCart className="w-5 h-5" />
+                  {cartTotalCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-primary text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                      {cartTotalCount}
+                    </span>
+                  )}
+                </Link>
+              )}
+              {isAuthenticated && (
+                <Link
+                  to="/profile"
+                  className="relative p-2 text-stone-600 hover:text-primary transition-colors"
+                >
+                  <FaUser className="w-5 h-5" />
+                </Link>
+              )}
               <LanguageSelector />
               <button
                 onClick={() => setMobileOpen(!mobileOpen)}
@@ -211,7 +244,21 @@ const Navbar = () => {
           </div>
 
           {/* Drawer Links */}
-          <div className="flex-1 overflow-y-auto py-6 px-5 space-y-2.5 bg-white">
+          <div className="flex-1 overflow-y-auto py-4 px-5 space-y-4 bg-white">
+            {/* Mobile Search Bar */}
+            <div className="relative mb-2">
+              <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 w-4 h-4" />
+              <input
+                type="text"
+                placeholder={t("search")}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearch}
+                className="w-full pl-11 pr-4 py-3 rounded-xl bg-stone-50 border border-stone-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all text-sm"
+              />
+            </div>
+            
+            <div className="space-y-2.5">
             {navLinks.map((link) => {
               const isActive = location.pathname === link.path;
               return (
@@ -234,6 +281,7 @@ const Navbar = () => {
                 </Link>
               );
             })}
+            </div>
           </div>
 
           {/* Drawer Footer Actions */}
@@ -246,6 +294,17 @@ const Navbar = () => {
               >
                 <FiShield className="w-4 h-4" />
                 <span>{t("admin")} Dashboard</span>
+              </Link>
+            )}
+
+            {isAuthenticated && (
+              <Link
+                to="/profile"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-center gap-2 w-full px-5 py-3.5 rounded-xl text-sm font-bold text-primary-dark bg-primary/10 hover:bg-primary/20 transition-colors shadow-xs"
+              >
+                <FaUser className="w-4 h-4" />
+                <span>{t("profile")}</span>
               </Link>
             )}
 

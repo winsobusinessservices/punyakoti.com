@@ -28,12 +28,6 @@ public class Address extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "full_name", nullable = false, length = 120)
-    private String fullName;
-
-    @Column(name = "phone_number", nullable = false, length = 20)
-    private String phoneNumber;
-
     @Column(name = "line1", nullable = false, length = 255)
     private String line1;
 

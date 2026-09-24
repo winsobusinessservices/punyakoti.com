@@ -95,7 +95,7 @@ const Hero = () => {
   //   </section>
   // );
   return (
-    <div className="relative w-full min-h-[85vh] md:min-h-[90vh] flex flex-col justify-center overflow-hidden pt-16 md:pt-0">
+    <div className="relative w-full flex flex-col justify-center overflow-hidden">
       <div
         className="absolute inset-0 z-0 opacity-[0.15]"
         style={{
@@ -103,7 +103,7 @@ const Hero = () => {
           backgroundSize: "70px 70px",
         }}
       ></div>
-      <div className="relative z-10 flex flex-col justify-center items-center w-full h-full pt-10 pb-12">
+      <div className="relative z-10 flex flex-col justify-center items-center w-full h-full pt-4 sm:pt-10 pb-4 sm:pb-12">
         <div className="relative w-full max-w-[95%] mx-auto">
           <img
             src="/hero4.png"
@@ -111,23 +111,23 @@ const Hero = () => {
             className="w-full h-auto max-h-[50vh] md:max-h-[60vh] object-contain"
           />
         </div>
-        <div className="flex flex-col items-center justify-end px-4 z-10 mt-8 text-center">
-          <span className="mb-6">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-black drop-shadow-sm leading-tight">
+        <div className="flex flex-col items-center justify-end px-4 z-10 mt-1 md:mt-8 text-center">
+          <span className="mb-2 md:mb-6">
+            <h1 className="text-2xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-black drop-shadow-sm leading-tight">
               Leading Cattle Supplements in India
             </h1>
           </span>
-          <div className="flex flex-col sm:flex-row justify-center gap-4 w-full max-w-xl mx-auto">
+          <div className="flex flex-row justify-center gap-4 w-full max-w-xl mx-auto">
             <Link
               to="/products"
-              className="w-full sm:w-auto bg-primary hover:bg-primary-dark text-white font-bold py-3.5 px-10 rounded-full transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 flex items-center justify-center gap-2 text-lg"
+              className="w-auto bg-primary hover:bg-primary-dark text-white font-bold py-1 px-3 sm:py-3.5 sm:px-10 rounded-full transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 flex items-center justify-center gap-2 sm:text-lg"
             >
               Explore Products
               <FcRight className="w-6 h-6 bg-white rounded-full p-0.5" />
             </Link>
             <Link
               to="/products"
-              className="w-full sm:w-auto bg-white/95 hover:bg-white text-gray-900 font-bold py-3.5 px-10 rounded-full transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 backdrop-blur-md text-center border border-gray-200 text-lg"
+              className="w-auto bg-white/95 hover:bg-white text-gray-900 font-bold py-1 px-3 sm:py-3.5 sm:px-10 rounded-full transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 backdrop-blur-md text-center border border-gray-200 sm:text-lg"
             >
               Shop Now
             </Link>

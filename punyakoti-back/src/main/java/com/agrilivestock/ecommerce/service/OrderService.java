@@ -14,4 +14,5 @@ public interface OrderService {
     PageResponse<OrderResponse> getAllOrdersAdmin(String search, Pageable pageable);
     OrderResponse updateOrderStatusAdmin(Long orderId, OrderStatusRequest request);
     OrderResponse verifyPayment(User currentUser, Long orderId, com.agrilivestock.ecommerce.dto.order.PaymentVerificationRequest request);
+    boolean hasUserPurchasedProduct(User currentUser, Long productId);
 }

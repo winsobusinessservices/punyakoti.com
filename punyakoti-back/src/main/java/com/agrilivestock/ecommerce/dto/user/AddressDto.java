@@ -6,14 +6,6 @@ import jakarta.validation.constraints.Size;
 public record AddressDto(
         Long id,
 
-        @NotBlank(message = "Full name is required")
-        @Size(max = 120, message = "Full name must not exceed 120 characters")
-        String fullName,
-
-        @NotBlank(message = "Phone number is required")
-        @Size(max = 20, message = "Phone number must not exceed 20 characters")
-        String phoneNumber,
-
         @NotBlank(message = "Address line 1 is required")
         @Size(max = 255, message = "Line 1 must not exceed 255 characters")
         String line1,

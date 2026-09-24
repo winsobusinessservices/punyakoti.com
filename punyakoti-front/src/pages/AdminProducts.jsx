@@ -13,7 +13,7 @@ const AdminProducts = () => {
 
   const { data: products = [], isLoading: loadingProducts } = useQuery({
     queryKey: ["products", "admin"],
-    queryFn: () => productApi.getProducts(null, true),
+    queryFn: () => productApi.getProducts({ isAdmin: true }),
   });
 
   const { data: categories = [], isLoading: loadingCategories } = useQuery({

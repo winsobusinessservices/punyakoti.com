@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { productApi } from "../api/productApi";
 import { reviewApi } from "../api/reviewApi";
+import { orderApi } from "../api/orderApi";
 import { useCart } from "../hooks/useCart";
 import { useAuth } from "../hooks/useAuth";
 import { FiStar, FiShoppingCart, FiCheckCircle } from "react-icons/fi";
@@ -111,7 +112,7 @@ const ProductDetails = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 text-left">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8 text-left">
       <Breadcrumb
         items={[
           { label: t("products"), path: "/products" },
@@ -125,7 +126,13 @@ const ProductDetails = () => {
           {/* Main Media window */}
           <div className="w-full">
             {activeMedia.type === "video" ? (
-              <VideoPlayer url={activeMedia.url} className="shadow-lg" />
+              <VideoPlayer
+                url={activeMedia.url}
+                controls={true}
+                autoPlay={true}
+                mutate={false}
+                className="shadow-lg"
+              />
             ) : (
               <div className="aspect-video w-full overflow-hidden rounded-3xl border border-stone-200 bg-white">
                 <img
@@ -211,12 +218,12 @@ const ProductDetails = () => {
           </div>
 
           {/* Dynamic Pricing */}
-          <div className="bg-primary/5 border border-primary/10 rounded-2xl p-5 flex items-center justify-between">
+          <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <span className="text-xs font-bold text-stone-400 uppercase tracking-wider block mb-1">
                 Pricing for selected weight
               </span>
-              <span className="text-3xl font-extrabold text-primary-dark">
+              <span className="text-2xl sm:text-3xl font-extrabold text-primary-dark">
                 ₹{currentPrice}
               </span>
             </div>
@@ -236,7 +243,7 @@ const ProductDetails = () => {
             <span className="text-xs font-bold text-stone-600 uppercase tracking-wider">
               Select Weight Option
             </span>
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
               {productVariants.map((opt) => (
                 <button
                   key={opt.id}
@@ -304,7 +311,7 @@ const ProductDetails = () => {
           {/* TABS (Description, Usage, Ingredients) */}
           <div className="space-y-4 pt-6 border-t border-stone-200">
             {/* Tab Headers */}
-            <div className="flex border-b border-stone-200 gap-6">
+            <div className="flex border-b border-stone-200 gap-3 sm:gap-6 overflow-x-auto hide-scrollbar">
               {["description", "usage", "ingredients", "reviews"].map((tab) => (
                 <button
                   key={tab}
@@ -404,6 +411,12 @@ const ReviewForm = ({ productId }) => {
   const [comment, setComment] = useState("");
   const [videoFile, setVideoFile] = useState(null);
 
+  const { data: hasPurchased } = useQuery({
+    queryKey: ["checkPurchase", productId],
+    queryFn: () => orderApi.checkPurchase(productId),
+    enabled: !!user,
+  });
+
   const { mutate: submitReview, isPending } = useMutation({
     mutationFn: (data) => reviewApi.createReview(data.payload, data.file),
     onSuccess: () => {
@@ -412,7 +425,10 @@ const ReviewForm = ({ productId }) => {
       setComment("");
       setVideoFile(null);
     },
-    onError: () => toast.error("Failed to submit review"),
+    onError: (err) => {
+      const errorMessage = err.response?.data?.message || "Failed to submit review";
+      toast.error(errorMessage);
+    },
   });
 
   if (!user) {
@@ -420,6 +436,16 @@ const ReviewForm = ({ productId }) => {
       <div className="bg-stone-50 p-4 rounded-xl text-center border border-stone-200 mt-4">
         <p className="text-sm font-medium text-stone-600 mb-2">
           Please log in to write a review.
+        </p>
+      </div>
+    );
+  }
+
+  if (hasPurchased === false) {
+    return (
+      <div className="bg-stone-50 p-4 rounded-xl text-center border border-stone-200 mt-4">
+        <p className="text-sm font-medium text-stone-600 mb-2">
+          You can only review products that you have purchased and received.
         </p>
       </div>
     );

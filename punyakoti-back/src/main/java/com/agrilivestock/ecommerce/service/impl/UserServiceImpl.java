@@ -29,6 +29,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
     private final UserMapper userMapper;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
     @Override
     public UserResponse getProfile(User currentUser) {
@@ -86,8 +87,6 @@ public class UserServiceImpl implements UserService {
             throw new ResourceNotFoundException("Address not found for current user");
         }
 
-        address.setFullName(addressDto.fullName());
-        address.setPhoneNumber(addressDto.phoneNumber());
         address.setLine1(addressDto.line1());
         address.setLine2(addressDto.line2());
         address.setCity(addressDto.city());
@@ -136,6 +135,35 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException("Admin account cannot be deleted");
         }
         user.setEnabled(active);
+        return userMapper.toResponse(userRepository.save(user));
+    }
+
+    @Override
+    @Transactional
+    public UserResponse updateUserDetails(Long userId, com.agrilivestock.ecommerce.dto.user.AdminUpdateUserRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        
+        // Ensure email uniqueness if changed
+        if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
+            if (userRepository.existsByEmail(request.getEmail())) {
+                throw new BadRequestException("Email already in use");
+            }
+            user.setEmail(request.getEmail());
+        }
+
+        if (request.getName() != null) {
+            user.setName(request.getName());
+        }
+        
+        if (request.getMobileNumber() != null) {
+            user.setMobileNumber(request.getMobileNumber());
+        }
+
+        if (request.getPassword() != null && !request.getPassword().trim().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+
         return userMapper.toResponse(userRepository.save(user));
     }
 }

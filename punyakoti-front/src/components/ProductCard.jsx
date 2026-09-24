@@ -9,8 +9,8 @@ const ProductCard = ({ product }) => {
   // console.log(product);
 
   return (
-    <div className="bg-white rounded-3xl overflow-hidden border border-stone-200/80 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full group hover:-translate-y-1">
-      <div className="relative aspect-square overflow-hidden shrink-0 p-3 m-4 rounded-2xl">
+    <div className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-stone-200/80 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col h-full group hover:-translate-y-1">
+      <div className="relative aspect-square overflow-hidden shrink-0 p-2 sm:p-3 m-2 sm:m-4 rounded-xl sm:rounded-2xl">
         <img
           src={
             (product.media || []).find((m) => m.type === "IMAGE")?.url ||
@@ -31,7 +31,7 @@ const ProductCard = ({ product }) => {
         </span>
       </div>
 
-      <div className="px-6 flex-grow flex flex-col justify-between pb-3">
+      <div className="px-3 sm:px-6 flex-grow flex flex-col justify-between pb-3">
         <div>
           {/* <div className="flex items-center gap-1.5 mb-2.5">
             <div className="flex items-center text-amber-400">
@@ -46,7 +46,7 @@ const ProductCard = ({ product }) => {
             </span>
           </div> */}
 
-          <h3 className="font-display font-semibold text-stone-850 text-base md:text-lg mb-2 leading-tight group-hover:text-secondary transition-colors">
+          <h3 className="font-display font-semibold text-stone-850 text-sm sm:text-base md:text-lg mb-1 sm:mb-2 leading-tight group-hover:text-secondary transition-colors line-clamp-2">
             <Link to={`/products/${product.id}`}>{product.name}</Link>
           </h3>
 
@@ -60,14 +60,14 @@ const ProductCard = ({ product }) => {
             })}
           </div>
 
-          <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed mb-4">
+          <p className="text-[10px] sm:text-xs text-stone-500 line-clamp-2 leading-relaxed mb-2 sm:mb-4">
             {product.shortDescription || product.description}
           </p>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-6">
           <div>
-            <span className="text-xl font-bold text-primary-dark">
+            <span className="text-base sm:text-xl font-bold text-primary-dark">
               ₹
               {product.variants && product.variants.length > 0
                 ? [...product.variants].sort((a, b) => a.price - b.price)[0]
@@ -77,7 +77,7 @@ const ProductCard = ({ product }) => {
           </div>
           <Link
             to={`/products/${product.id}`}
-            className="flex items-center w-full justify-center gap-2 bg-primary hover:bg-primary-light text-white font-semibold px-4 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95 focus:outline-hidden"
+            className="flex items-center w-full justify-center gap-1.5 sm:gap-2 bg-primary hover:bg-primary-light text-white font-semibold px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-all active:scale-95 focus:outline-hidden text-xs sm:text-sm"
           >
             <FaShoppingCart className="w-4 h-4" />
             <span>{t("shopNow")}</span>

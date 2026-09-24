@@ -19,10 +19,17 @@ import {
   FiPlus,
   FiEdit2,
   FiTrash2,
+  FiHelpCircle,
+  FiCheck,
+  FiXCircle,
+  FiPackage,
+  FiStar,
 } from "react-icons/fi";
 import Loader from "../components/Loader";
 import Breadcrumb from "../components/Breadcrumb";
+import Modal from "../components/Modal";
 import { userApi } from "../api/userApi";
+import { reviewApi } from "../api/reviewApi";
 import toast from "react-hot-toast";
 
 const Profile = () => {
@@ -75,12 +82,46 @@ const Profile = () => {
     enabled: !!user,
   });
 
+  // Review Form State
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewItem, setReviewItem] = useState(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewVideoFile, setReviewVideoFile] = useState(null);
+
+  const submitReviewMutation = useMutation({
+    mutationFn: (data) => reviewApi.createReview(data.payload, data.file),
+    onSuccess: () => {
+      toast.success("Review submitted for approval!");
+      setReviewModalOpen(false);
+      setReviewItem(null);
+      setReviewRating(5);
+      setReviewComment("");
+      setReviewVideoFile(null);
+    },
+    onError: (err) => {
+      const errorMessage = err.message || "Failed to submit review";
+      toast.error(errorMessage);
+    },
+  });
+
+  const handleReviewSubmit = (e) => {
+    e.preventDefault();
+    if (!reviewItem) return;
+    submitReviewMutation.mutate({
+      payload: {
+        productId: reviewItem.productId,
+        rating: reviewRating,
+        comment: reviewComment,
+      },
+      file: reviewVideoFile,
+    });
+  };
+
   // Address Form State
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState(null);
   const [addressForm, setAddressForm] = useState({
-    fullName: "",
-    phoneNumber: "",
     line1: "",
     line2: "",
     city: "",
@@ -92,8 +133,6 @@ const Profile = () => {
 
   const resetAddressForm = () => {
     setAddressForm({
-      fullName: "",
-      phoneNumber: "",
       line1: "",
       line2: "",
       city: "",
@@ -191,7 +230,9 @@ const Profile = () => {
   };
 
   const handlePayNow = async (paymentOrder) => {
-    const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+    const res = await loadScript(
+      "https://checkout.razorpay.com/v1/checkout.js",
+    );
 
     if (!res) {
       toast.error("Razorpay SDK failed to load. Are you online?");
@@ -261,16 +302,16 @@ const Profile = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 text-left">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8 text-left">
       <Breadcrumb items={[{ label: t("profile") }]} />
 
-      <h1 className="font-display font-extrabold text-3xl text-stone-850 m-0 pb-2 border-b border-stone-200">
+      <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-stone-850 m-0 pb-2 border-b border-stone-200">
         Account Settings
       </h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Side: Navigation */}
-        <div className="lg:col-span-4 bg-white border border-stone-200/80 rounded-3xl p-6 shadow-sm space-y-6">
+        <div className="lg:col-span-4 bg-white border border-stone-200/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm space-y-4 sm:space-y-6">
           <div className="flex items-center gap-4 border-b border-stone-100 pb-5">
             <div className="w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xl">
               {profile?.name
@@ -289,24 +330,30 @@ const Profile = () => {
             </div>
           </div>
 
-          <div className="space-y-2 text-sm font-semibold">
+          <div className="flex lg:flex-col gap-2 text-sm font-semibold overflow-x-auto hide-scrollbar">
             <button
               onClick={() => setActiveTab("orders")}
-              className={`w-full text-left px-4 py-3 rounded-xl transition-all flex items-center gap-2 ${activeTab === "orders" ? "bg-primary text-white" : "text-stone-600 hover:bg-stone-50"}`}
+              className={`w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap shrink-0 ${activeTab === "orders" ? "bg-primary text-white" : "text-stone-600 hover:bg-stone-50"}`}
             >
               <FiShoppingBag className="w-4 h-4" /> Order History
             </button>
             <button
               onClick={() => setActiveTab("profile")}
-              className={`w-full text-left px-4 py-3 rounded-xl transition-all flex items-center gap-2 ${activeTab === "profile" ? "bg-primary text-white" : "text-stone-600 hover:bg-stone-50"}`}
+              className={`w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap shrink-0 ${activeTab === "profile" ? "bg-primary text-white" : "text-stone-600 hover:bg-stone-50"}`}
             >
               <FiUser className="w-4 h-4" /> Profile Details
             </button>
             <button
               onClick={() => setActiveTab("addresses")}
-              className={`w-full text-left px-4 py-3 rounded-xl transition-all flex items-center gap-2 ${activeTab === "addresses" ? "bg-primary text-white" : "text-stone-600 hover:bg-stone-50"}`}
+              className={`w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap shrink-0 ${activeTab === "addresses" ? "bg-primary text-white" : "text-stone-600 hover:bg-stone-50"}`}
             >
               <FiGlobe className="w-4 h-4" /> Address Book
+            </button>
+            <button
+              onClick={() => setActiveTab("support")}
+              className={`w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap shrink-0 ${activeTab === "support" ? "bg-primary text-white" : "text-stone-600 hover:bg-stone-50"}`}
+            >
+              <FiHelpCircle className="w-4 h-4" /> Support
             </button>
 
             {/* System settings */}
@@ -334,7 +381,7 @@ const Profile = () => {
         </div>
 
         {/* Right Side: Content */}
-        <div className="lg:col-span-8 bg-white border border-stone-200/80 rounded-3xl p-6 shadow-sm space-y-6">
+        <div className="lg:col-span-8 bg-white border border-stone-200/80 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-sm space-y-4 sm:space-y-6">
           {activeTab === "orders" && (
             <>
               <div className="flex items-center gap-2 border-b border-stone-100 pb-3">
@@ -346,143 +393,213 @@ const Profile = () => {
               {loading ? (
                 <Loader />
               ) : orders.length > 0 ? (
-                <div className="space-y-4">
-                  {orders.map((order) => (
-                    <div
-                      key={order.id}
-                      className="border border-stone-200 rounded-2xl p-4 sm:p-5 flex flex-col gap-4 bg-stone-50/30 hover:border-stone-300 transition-colors"
-                    >
-                      <div className="space-y-3 w-full text-xs sm:text-sm">
-                        {/* Header: Order Number and Status */}
-                        <div className="flex flex-wrap justify-between items-center gap-2.5 border-b border-stone-100 pb-3">
+                <div className="space-y-6">
+                  {/* {console.log(orders)} */}
+
+                  {orders.map((order) => {
+                    const orderSteps = [
+                      "PENDING",
+                      "CONFIRMED",
+                      "PACKED",
+                      "SHIPPED",
+                      "DELIVERED",
+                    ];
+                    const progressIndex =
+                      order.status === "CANCELLED"
+                        ? -1
+                        : orderSteps.indexOf(order.status);
+
+                    return (
+                      <div
+                        key={order.id}
+                        className="border border-stone-200 rounded-3xl p-5 sm:p-7 flex flex-col gap-6 bg-white shadow-xs hover:shadow-md transition-shadow"
+                      >
+                        {/* Header: Order Number and Total */}
+                        <div className="flex flex-wrap justify-between items-center gap-4 border-b border-stone-100 pb-4">
                           <div className="flex flex-col">
-                            <span className="font-mono font-bold text-stone-850 text-base">
+                            <span className="font-display font-extrabold text-stone-850 text-lg">
                               {order.orderNumber || `Order #${order.id}`}
                             </span>
-                            <span className="flex items-center gap-1.5 text-stone-500 mt-1">
+                            <span className="flex items-center gap-1.5 text-stone-500 mt-0.5 text-xs font-medium">
                               <FiCalendar className="w-3.5 h-3.5" />
                               {order.createdAt
                                 ? new Date(order.createdAt).toLocaleString()
                                 : ""}
                             </span>
+                            <span className="mt-2 text-sm font-medium text-stone-500 capitalize">
+                              Payment Method: {order?.paymentMethod === "COD" ? "Cash On Delivery" : order?.paymentMethod  || "N/A"}
+                            </span>
                           </div>
-                          <span
-                            className={`text-[10px] font-bold px-3 py-1 border rounded-full ${getStatusColor(order.status, order.paymentStatus)}`}
-                          >
-                            {order.status === "PENDING" &&
-                            order.paymentStatus !== "SUCCESS" &&
-                            order.paymentStatus !== "PAID"
-                              ? "UNPAID / ABANDONED"
-                              : order.status}
-                          </span>
+                          <div className="text-right flex flex-col items-end">
+                            <span className="font-bold text-stone-850 text-lg">
+                              ₹{order.total}
+                            </span>
+                            <span
+                              className={`text-[10px] font-bold px-3 py-1 mt-1 border rounded-full ${getStatusColor(order.status, order.paymentStatus)}`}
+                            >
+                              {order.paymentStatus === "SUCCESS" ||
+                              order.paymentStatus === "PAID"
+                                ? "PAID"
+                                : "UNPAID"}
+                            </span>
+                          </div>
                         </div>
 
-                        {/* Order Details Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          {/* Shipping Address */}
-                          {order.address && (
-                            <div className="bg-white border border-stone-150 p-3 rounded-xl space-y-1">
-                              <h4 className="font-bold text-stone-700 mb-1 text-[11px] uppercase tracking-wide">
-                                Shipping Address
-                              </h4>
-                              <p className="font-semibold text-stone-800">
-                                {order.address.fullName}
-                              </p>
-                              <p className="text-stone-500 text-[11px] leading-relaxed">
-                                {order.address.line1}
-                                {order.address.line2
-                                  ? `, ${order.address.line2}`
-                                  : ""}
-                                <br />
-                                {order.address.city}, {order.address.state} -{" "}
-                                {order.address.postalCode}
-                                <br />
-                                {order.address.country}
-                              </p>
-                              <p className="text-stone-500 font-medium pt-1 flex items-center gap-1">
-                                <FiPhone className="w-3 h-3" /> +91{" "}
-                                {order.address.phoneNumber}
-                              </p>
+                        {/* Order Tracking Timeline */}
+                        <div className="py-4 px-2 sm:px-6">
+                          {order.status === "CANCELLED" ? (
+                            <div className="bg-rose-50 text-rose-600 p-4 rounded-xl flex items-center justify-center font-bold gap-2 text-sm">
+                              <FiXCircle className="w-5 h-5" /> This order was
+                              cancelled
+                            </div>
+                          ) : (
+                            <div className="relative flex justify-between items-center w-full">
+                              {/* Background track line */}
+                              <div className="absolute top-1/2 left-0 w-full h-1 bg-stone-100 -z-10 -translate-y-1/2 rounded-full"></div>
+                              {/* Active track line */}
+                              <div
+                                className="absolute top-1/2 left-0 h-1 bg-primary -z-10 -translate-y-1/2 rounded-full transition-all duration-700 ease-in-out"
+                                style={{
+                                  width: `${(Math.max(progressIndex, 0) / (orderSteps.length - 1)) * 100}%`,
+                                }}
+                              ></div>
+
+                              {orderSteps.map((step, idx) => {
+                                const isCompleted = idx <= progressIndex;
+                                const isCurrent = idx === progressIndex;
+
+                                let icon = (
+                                  <div className="w-2 h-2 rounded-full bg-stone-300"></div>
+                                );
+                                if (isCompleted) {
+                                  icon = <FiCheck className="w-4 h-4" />;
+                                }
+                                if (step === "DELIVERED" && isCompleted) {
+                                  icon = <FiPackage className="w-4 h-4" />;
+                                }
+
+                                return (
+                                  <div
+                                    key={step}
+                                    className="flex flex-col items-center gap-2 relative z-10"
+                                  >
+                                    <div
+                                      className={`w-8 h-8 rounded-full flex items-center justify-center shadow-xs transition-colors duration-500 ${isCompleted ? "bg-primary text-white ring-4 ring-primary/20" : "bg-white border-2 border-stone-200 text-stone-300"}`}
+                                    >
+                                      {icon}
+                                    </div>
+                                    <span
+                                      className={`text-[10px] sm:text-xs font-bold absolute top-10 whitespace-nowrap ${isCurrent ? "text-primary" : isCompleted ? "text-stone-800" : "text-stone-400"}`}
+                                    >
+                                      {step}
+                                    </span>
+                                  </div>
+                                );
+                              })}
                             </div>
                           )}
-
-                          {/* Payment Summary */}
-                          <div className="bg-white border border-stone-150 p-3 rounded-xl space-y-1">
-                            <h4 className="font-bold text-stone-700 mb-1 text-[11px] uppercase tracking-wide">
-                              Payment Summary
-                            </h4>
-                            <div className="flex justify-between text-stone-600">
-                              <span>Payment Status:</span>
-                              <span className="font-medium">
-                                {order.paymentStatus}
-                              </span>
-                            </div>
-                            {order.paymentId && (
-                              <div className="flex justify-between text-stone-600 mt-1">
-                                <span>Transaction ID:</span>
-                                <span className="font-mono text-[10px]">
-                                  {order.paymentId}
-                                </span>
-                              </div>
-                            )}
-                            <div className="flex justify-between text-stone-850 font-bold mt-2 pt-2 border-t border-stone-100">
-                              <span className="flex items-center gap-1">
-                                <FiDollarSign className="w-3.5 h-3.5" />
-                                Total
-                              </span>
-                              <span>₹{order.total}</span>
-                            </div>
-                            {order.status === "PENDING" &&
-                            order.paymentStatus !== "SUCCESS" &&
-                            order.paymentStatus !== "PAID" && (
-                              <div className="pt-2 mt-2 border-t border-stone-100">
-                                <button
-                                  onClick={() => handlePayNow(order)}
-                                  className="w-full py-2 bg-primary hover:bg-primary-dark text-white font-bold text-xs rounded-lg transition-colors shadow-xs"
-                                >
-                                  Pay Now
-                                </button>
-                              </div>
-                            )}
-                          </div>
                         </div>
 
-                        {/* Items List */}
-                        <div className="bg-white border border-stone-150 p-3 rounded-xl mt-3">
-                          <h4 className="font-bold text-stone-700 mb-2 text-[11px] uppercase tracking-wide border-b border-stone-100 pb-2">
-                            Order Items
-                          </h4>
-                          <div className="space-y-2">
-                            {(order.items || []).map((item, idx) => (
-                              <div
-                                key={idx}
-                                className="flex justify-between items-start text-[11px] sm:text-xs pt-1 border-t border-stone-50 first:border-0 first:pt-0"
-                              >
-                                <div>
-                                  <span className="font-semibold text-stone-800 block">
-                                    {item.productName}
-                                  </span>
-                                  <span className="text-stone-500 text-[10px]">
-                                    Variant: {item.variantWeight}
-                                  </span>
+                        {/* Items and Details Section */}
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pt-8 mt-2 border-t border-stone-100">
+                          {/* Left: Items List */}
+                          <div className="md:col-span-7 space-y-3">
+                            <h4 className="font-bold text-stone-700 text-xs uppercase tracking-wider mb-3">
+                              Items in your order
+                            </h4>
+                            <div className="space-y-3">
+                              {(order.items || []).map((item, idx) => (
+                                <div
+                                  key={idx}
+                                  className="flex flex-col gap-3 bg-stone-50/50 border border-stone-100 p-3 rounded-2xl"
+                                >
+                                  <div className="flex items-center gap-4">
+                                    {/* We don't have item image readily available, so placeholder */}
+                                    <div className="w-12 h-12 bg-stone-200 rounded-xl flex items-center justify-center text-stone-400 shrink-0">
+                                      <FiPackage className="w-5 h-5" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <span className="font-bold text-stone-800 block truncate text-sm">
+                                        {item.productName}
+                                      </span>
+                                      <span className="text-stone-500 text-xs font-medium">
+                                        Variant: {item.variantWeight}
+                                      </span>
+                                    </div>
+                                    <div className="text-right shrink-0">
+                                      <span className="font-extrabold text-stone-700 text-sm block">
+                                        ₹
+                                        {item.lineTotal ||
+                                          item.price * item.quantity}
+                                      </span>
+                                      <span className="text-stone-400 text-xs font-medium">
+                                        Qty: {item.quantity}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  {order.status === "DELIVERED" && (
+                                    <div className="flex justify-end pt-2 border-t border-stone-200/60">
+                                      <button
+                                        onClick={() => {
+                                          setReviewItem(item);
+                                          setReviewModalOpen(true);
+                                        }}
+                                        className="text-xs font-bold text-primary flex items-center gap-1.5 hover:text-primary-dark transition-colors py-1 px-3 rounded-lg hover:bg-primary/5"
+                                      >
+                                        <FiStar className="w-3.5 h-3.5" /> Write a Review
+                                      </button>
+                                    </div>
+                                  )}
                                 </div>
-                                <div className="text-right">
-                                  <span className="text-stone-500 text-[10px] block">
-                                    ₹{item.price} x {item.quantity}
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Right: Address & Payment Info */}
+                          <div className="md:col-span-5 space-y-4">
+                            {order.address && (
+                              <div className="bg-stone-50/50 border border-stone-100 p-4 rounded-2xl">
+                                <h4 className="font-bold text-stone-700 mb-2 text-xs uppercase tracking-wider flex items-center gap-2">
+                                  <FiGlobe className="text-stone-400" />{" "}
+                                  Delivery Address
+                                </h4>
+                                <div className="text-stone-600 text-xs leading-relaxed font-medium">
+                                  <span className="font-bold text-stone-800 block mb-0.5">
+                                    {order?.name}
                                   </span>
-                                  <span className="font-bold text-stone-700">
-                                    ₹
-                                    {item.lineTotal ||
-                                      item.price * item.quantity}
+                                  {order.address.line1}
+                                  {order.address.line2
+                                    ? `, ${order.address.line2}`
+                                    : ""}
+                                  <br />
+                                  {order.address.city}, {order.address.state} -{" "}
+                                  {order.address.postalCode}
+                                  <br />
+                                  <span className="flex items-center gap-1.5 mt-1 text-stone-500">
+                                    <FiPhone className="w-3.5 h-3.5" /> +91{" "}
+                                    {order?.phoneNumber}
                                   </span>
                                 </div>
                               </div>
-                            ))}
+                            )}
+
+                            {/* Pay Now Button (if pending) */}
+                            {order.status === "PENDING" &&
+                              order.paymentStatus !== "SUCCESS" &&
+                              order.paymentStatus !== "PAID" && (
+                                <button
+                                  onClick={() => handlePayNow(order)}
+                                  className="w-full py-3 bg-primary hover:bg-primary-dark text-white font-bold text-sm rounded-xl transition-all shadow-[0_8px_20px_rgb(56,116,255,0.25)] hover:shadow-[0_8px_25px_rgb(56,116,255,0.35)] hover:-translate-y-0.5"
+                                >
+                                  Complete Payment
+                                </button>
+                              )}
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
 
                   {/* Pagination Controls */}
                   {ordersTotalPages > 1 && (
@@ -624,7 +741,7 @@ const Profile = () => {
                     {editingAddressId ? "Edit Address" : "New Address"}
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <input
+                    {/* <input
                       type="text"
                       placeholder="Full Name"
                       required
@@ -649,7 +766,7 @@ const Profile = () => {
                         })
                       }
                       className="w-full bg-white border border-stone-250 rounded-xl px-3 py-2 text-sm focus:outline-hidden focus:border-primary"
-                    />
+                    /> */}
                     <input
                       type="text"
                       placeholder="Address Line 1"
@@ -787,8 +904,117 @@ const Profile = () => {
               )}
             </>
           )}
+          {activeTab === "support" && (
+            <div className="space-y-6">
+              <div className="flex items-center gap-2 border-b border-stone-100 pb-3">
+                <h3 className="font-display font-bold text-stone-850 text-base md:text-lg">
+                  Support & Account Settings
+                </h3>
+              </div>
+              <div className="bg-stone-50 rounded-2xl p-5 border border-stone-200 text-sm text-stone-600 leading-relaxed space-y-4">
+                <p>
+                  To ensure the highest level of security for your account,
+                  critical details such as your <strong>Email Address</strong>,{" "}
+                  <strong>Mobile Number</strong>, and <strong>Password</strong>{" "}
+                  cannot be changed directly from this dashboard.
+                </p>
+                <p>
+                  If you need to update any of these details, please reach out
+                  to our support team. An administrator will verify your
+                  identity and safely update your profile.
+                </p>
+                <div className="pt-2 flex flex-col sm:flex-row gap-4">
+                  <a
+                    href="mailto:support@punyakoti.com"
+                    className="flex items-center justify-center gap-2 bg-white border border-stone-200 hover:border-primary text-stone-800 font-bold py-2.5 px-6 rounded-xl transition-colors shadow-xs"
+                  >
+                    <FiMail className="w-4 h-4" /> support@punyakoti.com
+                  </a>
+                  <a
+                    href="tel:+919876543210"
+                    className="flex items-center justify-center gap-2 bg-white border border-stone-200 hover:border-primary text-stone-800 font-bold py-2.5 px-6 rounded-xl transition-colors shadow-xs"
+                  >
+                    <FiPhone className="w-4 h-4" /> +91 98765 43210
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-      </div>
+    </div>
+
+      {/* Review Modal */}
+      <Modal
+        isOpen={reviewModalOpen}
+        onClose={() => setReviewModalOpen(false)}
+        title={`Review ${reviewItem?.productName || "Product"}`}
+        size="md"
+      >
+        <form onSubmit={handleReviewSubmit} className="space-y-5">
+          <div>
+            <label className="block text-xs font-bold text-stone-600 uppercase mb-2">
+              Rating
+            </label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  type="button"
+                  key={star}
+                  onClick={() => setReviewRating(star)}
+                  className="focus:outline-hidden"
+                >
+                  <FiStar
+                    className={`w-8 h-8 ${star <= reviewRating ? "fill-amber-400 text-amber-400" : "text-stone-200 hover:text-amber-200"} transition-colors`}
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-stone-600 uppercase mb-2">
+              Comment
+            </label>
+            <textarea
+              required
+              value={reviewComment}
+              onChange={(e) => setReviewComment(e.target.value)}
+              rows="4"
+              className="w-full bg-white border border-stone-200 hover:border-stone-300 rounded-xl px-4 py-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+              placeholder="Tell us about your experience with this product..."
+            ></textarea>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-stone-600 uppercase mb-2">
+              Attach Video (Optional)
+            </label>
+            <input
+              type="file"
+              accept="video/*"
+              onChange={(e) => setReviewVideoFile(e.target.files[0])}
+              className="w-full text-sm text-stone-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-colors cursor-pointer"
+            />
+          </div>
+
+          <div className="pt-2 flex justify-end gap-3 border-t border-stone-100 mt-6">
+            <button
+              type="button"
+              onClick={() => setReviewModalOpen(false)}
+              className="px-5 py-2.5 text-sm font-bold text-stone-600 hover:bg-stone-100 rounded-xl transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={submitReviewMutation.isPending}
+              className="px-5 py-2.5 text-sm font-bold text-white bg-primary hover:bg-primary-dark rounded-xl transition-colors disabled:opacity-50 cursor-pointer"
+            >
+              {submitReviewMutation.isPending ? "Submitting..." : "Submit Review"}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };

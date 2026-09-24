@@ -18,4 +18,5 @@ public interface UserService {
     void deleteAddress(User currentUser, Long addressId);
     PageResponse<UserResponse> getAllUsers(Pageable pageable);
     UserResponse updateUserStatus(Long userId, boolean active);
+    UserResponse updateUserDetails(Long userId, com.agrilivestock.ecommerce.dto.user.AdminUpdateUserRequest request);
 }

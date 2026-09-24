@@ -69,4 +69,12 @@ public class OrderController {
         OrderResponse order = orderService.verifyPayment(currentUser, id, request);
         return ResponseEntity.ok(ApiResponse.success("Payment verified successfully", order));
     }
+
+    @GetMapping("/check-purchase")
+    @Operation(summary = "Check if current user has purchased a product")
+    public ResponseEntity<ApiResponse<Boolean>> checkPurchase(@RequestParam Long productId) {
+        User currentUser = securityUtils.getCurrentUser();
+        boolean hasPurchased = orderService.hasUserPurchasedProduct(currentUser, productId);
+        return ResponseEntity.ok(ApiResponse.success("Purchase status retrieved", hasPurchased));
+    }
 }

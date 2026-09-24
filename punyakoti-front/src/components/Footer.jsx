@@ -8,25 +8,25 @@ const Footer = () => {
   const { t } = useTranslation();
 
   return (
-    <footer className="bg-gray-900 text-stone-300 relative overflow-hidden pt-16 lg:pt-24 pb-8 border-t border-gray-800 mt-20">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 flex flex-col justify-between">
+    <footer className="bg-gray-900 text-stone-300 relative overflow-hidden pt-10 sm:pt-16 lg:pt-24 pb-6 sm:pb-8 border-t border-gray-800 mt-12 sm:mt-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col justify-between">
         {/* Top Section - Links and Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-20 lg:mb-32">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12 lg:gap-8 mb-12 sm:mb-20 lg:mb-32">
           {/* Brand/About */}
-          <div className="space-y-6 lg:col-span-1">
+          <div className="space-y-4 sm:space-y-6 col-span-2 lg:col-span-1">
             <div className="flex items-center gap-3">
               <div className="bg-white p-1 rounded-xl shadow-sm">
                 <img
                   src="/punyakoti-logo.jpeg"
                   alt={t("brandName") || "Punyakoti"}
-                  className="w-10 h-10 rounded-lg object-contain"
+                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg object-contain"
                 />
               </div>
-              <span className="text-2xl font-display font-bold text-white tracking-wide">
+              <span className="text-xl sm:text-2xl font-display font-bold text-white tracking-wide">
                 {t("brandName") || "Punyakoti"}
               </span>
             </div>
-            <p className="text-sm text-gray-400 leading-relaxed max-w-sm">
+            <p className="text-xs sm:text-sm text-gray-400 leading-relaxed max-w-sm">
               Nourishing families with pure, unadulterated, cattle products
               sourced responsibly using traditional methods.
             </p>
@@ -145,11 +145,11 @@ const Footer = () => {
           </div>
 
           {/* Giant Background Text */}
-          <div className="w-full text-center flex justify-center items-center pointer-events-none select-none relative mt-8 md:-mt-12 lg:-mt-24 z-0">
+          <div className="w-full text-center flex justify-center items-center pointer-events-none select-none relative mt-4 sm:mt-8 md:-mt-12 lg:-mt-24 z-0 overflow-hidden">
             <span
-              className="font-display font-black uppercase leading-none tracking-tighter bg-gradient-to-b from-gray-800 to-gray-900 text-transparent bg-clip-text"
+              className="font-display font-black uppercase leading-none tracking-tighter bg-gradient-to-b from-gray-800 to-gray-900 text-transparent bg-clip-text block w-full"
               style={{
-                fontSize: "clamp(4rem, 18vw, 18rem)",
+                fontSize: "clamp(2.5rem, 15vw, 18rem)",
               }}
             >
               Punyakoti
